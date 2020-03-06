@@ -9,30 +9,41 @@ import { Container } from './styles';
 // import { Container } from './styles';
 
 export default class Main extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
-      name: '',
+      inputName: '',
+      inputDescription: '',
     };
   }
 
   handleChange = event => {
-    this.setState({ name: event.target.value });
+    const inputName = event.target.id;
+    const inputValue = event.target.value;
+
+    this.setState({
+      [inputName]: inputValue,
+    });
   };
 
   handleSubmit = event => {
     event.preventDefault();
 
-    const { name } = this.state;
-
-    const user = {
-      name,
+    const { inputName, inputDescription } = this.state;
+    const serviceCategory = {
+      name: inputName,
+      description: inputDescription,
     };
 
-    api.post(`/serviceCategory`, { user }).then(res => {
-      console.log(user);
+    console.log(serviceCategory);
+
+    api.post(`/serviceCategory`, serviceCategory).then(res => {
       console.log(res);
-      console.log(res.data);
+    });
+
+    this.setState({
+      inputName: '',
+      inputDescription: '',
     });
   };
 
@@ -42,11 +53,17 @@ export default class Main extends Component {
         <form onSubmit={this.handleSubmit}>
           <h1>Categoria de Serviço</h1>
 
-          <Input id="name" label="Nome" />
           <Input
-            id="description"
+            id="inputName"
+            label="Nome"
+            onChange={this.handleChange}
+            value={this.state.inputName}
+          />
+          <Input
+            id="inputDescription"
             label="Descrição"
             onChange={this.handleChange}
+            value={this.state.inputDescription}
           />
 
           <button type="submit">Enviar</button>
