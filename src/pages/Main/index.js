@@ -1,6 +1,8 @@
 /* eslint-disable react/prefer-stateless-function */
 import React, { Component } from 'react';
 
+import Modal from '../../components/Modal';
+
 import api from '../../services/api';
 
 import Input from '../../components/Input/index';
@@ -14,6 +16,9 @@ export default class Main extends Component {
     this.state = {
       inputName: '',
       inputDescription: '',
+      modal: false,
+      loading: false,
+      result: '',
     };
   }
 
@@ -26,8 +31,9 @@ export default class Main extends Component {
     });
   };
 
-  handleSubmit = event => {
+  handleSubmit = async event => {
     event.preventDefault();
+    this.setState({ loading: true });
 
     const { inputName, inputDescription } = this.state;
     const serviceCategory = {
@@ -35,19 +41,41 @@ export default class Main extends Component {
       description: inputDescription,
     };
 
-    console.log(serviceCategory);
+    try {
+      api.post(`/serviceCategory`, serviceCategory).then(res => {
+        console.log(res.status);
+        this.setState({
+          result: res.data,
+        });
+      });
 
-    api.post(`/serviceCategory`, serviceCategory).then(res => {
-      console.log(res);
-    });
+      this.setState({
+        modal: true,
+        inputName: '',
+        inputDescription: '',
+      });
+    } catch (error) {
+      console.log('Ocorreu um erro. Por favor, tente novamente.');
+      console.log(error);
+    } finally {
+      this.setState({ loading: false });
+    }
+  };
 
+  showModal = () => {
     this.setState({
-      inputName: '',
-      inputDescription: '',
+      modal: true,
+    });
+  };
+
+  hideModal = () => {
+    this.setState({
+      modal: false,
     });
   };
 
   render() {
+    const { inputName, inputDescription, loading, modal, result } = this.state;
     return (
       <Container>
         <form onSubmit={this.handleSubmit}>
@@ -57,16 +85,22 @@ export default class Main extends Component {
             id="inputName"
             label="Nome"
             onChange={this.handleChange}
-            value={this.state.inputName}
+            value={inputName}
+            required
           />
           <Input
             id="inputDescription"
             label="Descrição"
             onChange={this.handleChange}
-            value={this.state.inputDescription}
+            value={inputDescription}
           />
-
-          <button type="submit">Enviar</button>
+          <button type="submit">
+            {loading ? <i className="fa fa-spinner fa-pulse" /> : 'Enviar'}
+          </button>
+          <button type="button" onClick={this.showModal}>
+            Modal
+          </button>
+          <Modal show={modal} close={this.hideModal} content={result} />
         </form>
       </Container>
     );

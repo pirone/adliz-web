@@ -1,5 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 
+import 'font-awesome/css/font-awesome.css';
+
 export default createGlobalStyle`
   * {
     margin: 0;
@@ -13,7 +15,7 @@ export default createGlobalStyle`
   }
 
   body {
-    background: #7159c1;
+    background: #67008a;
     -webkit-font-smoothing: antialiased !important;
   }
 
@@ -25,6 +27,23 @@ export default createGlobalStyle`
 
   button {
     cursor: pointer;
+    color: #000;
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    border-radius: .25rem;
+    font-size: 1rem;
+  }
+
+  .blue {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
   }
 
 `;

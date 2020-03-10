@@ -16,5 +16,12 @@ export const InputBoostrap = styled.div`
     background-clip: padding-box;
     border: 1px solid #a4a4a4;
     border-radius: 0.25rem;
+
+    &.interacted:invalid {
+      border: 1.5px solid red;
+    }
+
+    &.interacted:valid {
+      border: 1.5px solid green;
   }
 `;
