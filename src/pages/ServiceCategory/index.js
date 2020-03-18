@@ -55,8 +55,9 @@ export default class ServiceCat extends Component {
       <Formik
         initialValues={{ nome: '', descricao: '' }}
         validationSchema={formSchema}
-        onSubmit={values => {
+        onSubmit={(values, { resetForm }) => {
           this.handleSubmit(values);
+          resetForm();
         }}
       >
         {({ handleSubmit, handleChange, values, errors, touched }) => (
