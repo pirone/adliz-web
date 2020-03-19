@@ -27,13 +27,14 @@ const Modalz = ({ show, title, content, onHide }) => (
 Modalz.propTypes = {
   show: PropTypes.bool,
   title: PropTypes.string,
-  content: PropTypes.string.isRequired,
+  content: PropTypes.string,
   onHide: PropTypes.func.isRequired,
 };
 
 Modalz.defaultProps = {
   show: false,
   title: 'Mensagem',
+  content: 'Mensagem padrão',
 };
 
 export default Modalz;

@@ -8,11 +8,10 @@ import { Container } from './styles';
 export default function Main() {
   const [categories, setCategories] = useState([]);
 
-  const getCategories = async () => {
-    const response = await api.get('/serviceCategory');
-    setCategories(response.data);
-    console.log(response.data);
-    console.log(categories);
+  const getCategories = () => {
+    api.get('/serviceCategory').then(result => {
+      setCategories(result.data);
+    });
   };
 
   useEffect(() => {
@@ -24,18 +23,17 @@ export default function Main() {
       <Table responsive>
         <thead>
           <tr>
-            <th>#</th>
             <th>Nome</th>
             <th>Descrição</th>
           </tr>
         </thead>
         <tbody>
-          {/* {categories.map(cat => (
+          {categories.map(cat => (
             <tr>
-              <td>cat.name</td>
-              <td>cat.description</td>
+              <td>{cat.name}</td>
+              <td>{cat.description}</td>
             </tr>
-          ))} */}
+          ))}
         </tbody>
       </Table>
     </Container>

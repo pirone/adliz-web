@@ -16,8 +16,6 @@ export default function ServiceCatList() {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState();
 
-  const hideModal = () => setShowModal(false);
-
   const setSubmit = values => {
     const serviceCategory = {
       name: values.nome,
@@ -83,7 +81,7 @@ export default function ServiceCatList() {
             show={showModal}
             title="Teste"
             content={modalContent}
-            onHide={() => hideModal}
+            onHide={() => setShowModal(false)}
           />
         </Container>
       )}
