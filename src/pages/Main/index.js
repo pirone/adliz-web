@@ -9,9 +9,14 @@ export default function Main() {
   const [categories, setCategories] = useState([]);
 
   const getCategories = () => {
-    api.get('/serviceCategory').then(result => {
-      setCategories(result.data);
-    });
+    api
+      .get('/serviceCategory')
+      .then(result => {
+        setCategories(result.data);
+      })
+      .catch(error => {
+        console.log(error.message);
+      });
   };
 
   useEffect(() => {

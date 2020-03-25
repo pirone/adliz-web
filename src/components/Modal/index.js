@@ -34,7 +34,6 @@ Modalz.propTypes = {
 Modalz.defaultProps = {
   show: false,
   title: 'Mensagem',
-  content: 'Mensagem padrão',
 };
 
 export default Modalz;

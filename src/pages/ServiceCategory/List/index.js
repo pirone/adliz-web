@@ -21,17 +21,25 @@ export default function ServiceCatList() {
       name: values.nome,
       description: values.descricao,
     };
-    try {
-      api.post(`/serviceCategory`, serviceCategory).then(res => {
+
+    api
+      .post(`/serviceCategory`, serviceCategory)
+      .then(res => {
         console.log(res.status);
         setModalContent(res.data);
+      })
+      .catch(error => {
+        if (!error.response) {
+          // network error
+          setModalContent(
+            'Ocorreu um erro de conexão com o servidor. Por favor contacte um administrador.'
+          );
+        } else {
+          setModalContent(error.response.data.message);
+        }
       });
-    } catch (error) {
-      console.log(error.response);
-      setModalContent(error.response.data.error);
-    } finally {
-      setShowModal(true);
-    }
+
+    setShowModal(true);
   };
 
   return (

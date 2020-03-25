@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Routes from './routes';
 import GlobalStyle from './styles/global';
@@ -6,11 +6,19 @@ import GlobalStyle from './styles/global';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Menu from './components/Navbar';
+import Topbar from './components/Topbar';
 
 function App() {
+  const [navBar, setShowNavBar] = useState(false);
+
+  function showHideNavBar() {
+    setShowNavBar(!navBar);
+    console.log(navBar);
+  }
   return (
     <>
-      <Menu />
+      <Topbar handleNavBar={showHideNavBar} />
+      <Menu handleNavBar={navBar} />
       <Routes />
       <GlobalStyle />
     </>
