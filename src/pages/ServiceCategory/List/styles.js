@@ -14,4 +14,22 @@ export const Container = styled.div`
     flex-direction: row;
     align-items: center;
   }
+
+  .topbox {
+    margin-bottom: 10px;
+    text-align: right;
+  }
+
+  .actions {
+    width: 80px;
+  }
+
+  table button {
+    font-size: 15px;
+    padding: 0px 4px;
+  }
+  .btEdit {
+    padding-right: 1px;
+    margin-right: 2px;
+  }
 `;

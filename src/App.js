@@ -9,7 +9,7 @@ import Menu from './components/Navbar';
 import Topbar from './components/Topbar';
 
 function App() {
-  const [navBar, setShowNavBar] = useState(false);
+  const [navBar, setShowNavBar] = useState(true);
 
   function showHideNavBar() {
     setShowNavBar(!navBar);
