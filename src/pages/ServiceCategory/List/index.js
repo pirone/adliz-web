@@ -1,6 +1,6 @@
 /* eslint-disable react/prefer-stateless-function */
 import React, { useState, useEffect } from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, Pagination } from 'react-bootstrap';
 
 import api from '../../../services/api';
 import { Container } from './styles';
@@ -15,12 +15,30 @@ export default function Main() {
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [modalResponseContent, setModalResponseContent] = useState();
   const [categoryUpdate, setCategoryUpdate] = useState();
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const [totalPages, setTotalPages] = useState();
+
+  const pageItems = [];
+
+  for (let index = 0; index < totalPages; index += 1) {
+    pageItems.push(
+      <Pagination.Item
+        key={index}
+        active={index === currentPage}
+        onClick={() => setCurrentPage(index)}
+      >
+        {index + 1}
+      </Pagination.Item>
+    );
+  }
 
   const getCategories = () => {
     api
-      .get('/serviceCategory')
+      .get(`/serviceCategory/all/${currentPage}`)
       .then(result => {
-        setCategories(result.data);
+        setCategories(result.data.content);
+        setTotalPages(result.data.totalPages);
       })
       .catch(error => {
         console.log(error.message);
@@ -38,7 +56,7 @@ export default function Main() {
 
   useEffect(() => {
     getCategories();
-  }, []);
+  }, [currentPage]);
 
   const showHideAddModal = () => {
     setShowAddFormModal(!showAddFormModal);
@@ -148,6 +166,13 @@ export default function Main() {
           ))}
         </tbody>
       </Table>
+      <Pagination>
+        <Pagination.First onClick={() => setCurrentPage(0)} />
+        <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} />
+        {pageItems}
+        <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} />
+        <Pagination.Last onClick={() => setCurrentPage(totalPages - 1)} />
+      </Pagination>
       <Form
         modalForm={showAddFormModal}
         handleClose={showHideAddModal}
