@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import api from '../../services/api';
-import Modalz from '../../components/Modal';
+import { InfoModal } from '../../components/Modal';
 
 import { Container } from './styles';
 
@@ -85,7 +85,7 @@ export default function ServiceCatList() {
               Enviar
             </Button>
           </Form>
-          <Modalz
+          <InfoModal
             show={showModal}
             title="Teste"
             content={modalContent}

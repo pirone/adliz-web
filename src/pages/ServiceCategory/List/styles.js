@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  max-width: 700px;
+  max-width: 1000px;
   background: #fff;
   border-radius: 4px;
   box-shadow: 0 0 8px rgba(0, 0, 0.1);
@@ -16,8 +16,15 @@ export const Container = styled.div`
   }
 
   .topbox {
-    margin-bottom: 10px;
-    text-align: right;
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+    & .pageButton {
+      justify-content: flex-end;
+    }
+    & .pageTitle {
+      justify-content: flex-start;
+    }
   }
 
   .actions {

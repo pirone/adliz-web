@@ -6,26 +6,21 @@ export const Header = styled.header`
   left: 0;
   width: 100%;
   z-index: 100;
-  background: #000;
+  background: #38627A;
   height: 50px;
-  line-height: 50px;
   color: #fff;
+  padding: 2px 0;
   @include background-image(linear-gradient(45deg, #1becbf 0%, #1bece4 45%));
 
   button{
     cursor: pointer;
     color: #fff;
-    -webkit-appearance: none;
-    margin:0;
-    padding: 0;
-    border: none;
-    height: 50px;
+    height: 45px;
     width: 50px;
-    vertical-align: top;
     background: transparent;
-    border-right: 1px solid rgba(255,255,255,.7);
+    border-right: 1px solid;
     margin-right: 15px;
-    @include transition(background-color .3s linear);
+    border-radius: 0;
     &:hover,
     &:focus,
     &.active{

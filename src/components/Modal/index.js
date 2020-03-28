@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import { Modal, Button } from 'react-bootstrap';
 
-const Modalz = ({ show, title, content, onHide }) => (
+export const InfoModal = ({ show, title, content, onHide }) => (
   <Modal
     show={show}
     size="lg"
@@ -24,16 +24,39 @@ const Modalz = ({ show, title, content, onHide }) => (
   </Modal>
 );
 
-Modalz.propTypes = {
+InfoModal.propTypes = {
   show: PropTypes.bool,
   title: PropTypes.string,
   content: PropTypes.string,
   onHide: PropTypes.func.isRequired,
 };
 
-Modalz.defaultProps = {
+InfoModal.defaultProps = {
   show: false,
   title: 'Mensagem',
 };
 
-export default Modalz;
+export const ConfirmDialog = ({ show, title, content, onHide, confirm }) => (
+  <Modal
+    show={show}
+    size="lg"
+    aria-labelledby="contained-modal-title-vcenter"
+    onHide={onHide}
+    centered
+  >
+    <Modal.Header closeButton>
+      <Modal.Title id="contained-modal-title-vcenter">{title}</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <p>{content}</p>
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="secondary" onClick={onHide}>
+        Não
+      </Button>
+      <Button variant="primary" onClick={confirm}>
+        Sim
+      </Button>
+    </Modal.Footer>
+  </Modal>
+);

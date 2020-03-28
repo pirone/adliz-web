@@ -1,39 +1,27 @@
 /* eslint-disable react/prefer-stateless-function */
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Pagination } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Table, Button } from 'react-bootstrap';
 
 import api from '../../../services/api';
 import { Container } from './styles';
 
 import Form from '../Form';
-import Modalz from '../../../components/Modal';
+import { InfoModal, ConfirmDialog } from '../../../components/Modal';
+import Pagination from '../../../components/Pagination';
 
 export default function Main() {
   const [categories, setCategories] = useState([]);
   const [showAddFormModal, setShowAddFormModal] = useState(false);
   const [showEditFormModal, setShowEditFormModal] = useState(false);
+  const [showDeleteFormModal, setShowDeleteFormModal] = useState(false);
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [modalResponseContent, setModalResponseContent] = useState();
   const [categoryUpdate, setCategoryUpdate] = useState();
+  const [categoryDelete, setCategoryDelete] = useState();
   const [currentPage, setCurrentPage] = useState(0);
-
   const [totalPages, setTotalPages] = useState();
 
-  const pageItems = [];
-
-  for (let index = 0; index < totalPages; index += 1) {
-    pageItems.push(
-      <Pagination.Item
-        key={index}
-        active={index === currentPage}
-        onClick={() => setCurrentPage(index)}
-      >
-        {index + 1}
-      </Pagination.Item>
-    );
-  }
-
-  const getCategories = () => {
+  const getCategories = useCallback(() => {
     api
       .get(`/serviceCategory/all/${currentPage}`)
       .then(result => {
@@ -43,7 +31,7 @@ export default function Main() {
       .catch(error => {
         console.log(error.message);
       });
-  };
+  }, [currentPage]);
 
   const getCategory = async id => {
     try {
@@ -56,7 +44,7 @@ export default function Main() {
 
   useEffect(() => {
     getCategories();
-  }, [currentPage]);
+  }, [getCategories, currentPage]);
 
   const showHideAddModal = () => {
     setShowAddFormModal(!showAddFormModal);
@@ -67,6 +55,11 @@ export default function Main() {
     if (showEditFormModal === false) {
       getCategory(id);
     }
+  };
+
+  const showHideDeleteModal = id => {
+    setShowDeleteFormModal(!showDeleteFormModal);
+    setCategoryDelete(id);
   };
 
   const showHideResponseModal = () => {
@@ -129,13 +122,40 @@ export default function Main() {
     setShowResponseModal(true);
   };
 
+  const handleDelete = () => {
+    api
+      .delete(`/serviceCategory/${categoryDelete}`)
+      .then(res => {
+        console.log(res.status);
+        setModalResponseContent(res.data);
+        getCategories();
+        showHideDeleteModal();
+      })
+      .catch(error => {
+        if (!error.response) {
+          // network error
+          setModalResponseContent(
+            'Ocorreu um erro de conexão com o servidor. Por favor contacte um administrador.'
+          );
+        } else {
+          setModalResponseContent(error.response.data.message);
+        }
+      });
+
+    setShowResponseModal(true);
+  };
+
   return (
     <Container>
       <div className="topbox">
-        <h1>Categorias de Serviço</h1>
-        <Button variant="dark" type="button" onClick={showHideAddModal}>
-          Incluir
-        </Button>
+        <div className="pageTitle">
+          <h1>Categorias de Serviço</h1>
+        </div>
+        <div className="pageButton">
+          <Button variant="dark" type="button" onClick={showHideAddModal}>
+            Incluir
+          </Button>
+        </div>
       </div>
       <Table responsive>
         <thead>
@@ -158,7 +178,10 @@ export default function Main() {
                 >
                   <i className="fa fa-edit" />
                 </Button>
-                <Button variant="dark">
+                <Button
+                  variant="dark"
+                  onClick={() => showHideDeleteModal(cat.id)}
+                >
                   <i className="fa fa-trash" />
                 </Button>
               </td>
@@ -166,13 +189,11 @@ export default function Main() {
           ))}
         </tbody>
       </Table>
-      <Pagination>
-        <Pagination.First onClick={() => setCurrentPage(0)} />
-        <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} />
-        {pageItems}
-        <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} />
-        <Pagination.Last onClick={() => setCurrentPage(totalPages - 1)} />
-      </Pagination>
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
       <Form
         modalForm={showAddFormModal}
         handleClose={showHideAddModal}
@@ -184,11 +205,18 @@ export default function Main() {
         handleClose={showHideEditModal}
         setSubmit={setUpdate}
       />
-      <Modalz
+      <InfoModal
         show={showResponseModal}
         title="Resultado"
         content={modalResponseContent}
         onHide={showHideResponseModal}
+      />
+      <ConfirmDialog
+        show={showDeleteFormModal}
+        title="Confirmação"
+        content="Tem certeza que deseja excluir o registro?"
+        onHide={showHideDeleteModal}
+        confirm={handleDelete}
       />
     </Container>
   );

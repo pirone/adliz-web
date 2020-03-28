@@ -7,7 +7,7 @@ export const Nav = styled.aside.attrs(() => ({ className: 'vertical-nav' }))`
   width: 300px;
   color: #fff;
   left: ${props => (props.show ? 0 : '-300px')};
-  background-color: #494c52;
+  background-color: #667b87;
   padding: 20px;
   padding-top: 60px;
   transition: left 0.4s, width 0.5s;
