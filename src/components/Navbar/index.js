@@ -20,9 +20,9 @@ export default function Menu(props) {
           </a>
         </li>
         <li className="nav-item">
-          <a href="/listsc" className="nav-link">
+          <a href="/services" className="nav-link">
             <i className="fa fa-cubes" />
-            Services
+            Serviços
           </a>
         </li>
         <li className="nav-item">

@@ -10,6 +10,7 @@ export const Header = styled.header`
   height: 50px;
   color: #fff;
   padding: 2px 0;
+  z-index: 200;
   @include background-image(linear-gradient(45deg, #1becbf 0%, #1bece4 45%));
 
   button{

@@ -11,6 +11,7 @@ export const Nav = styled.aside.attrs(() => ({ className: 'vertical-nav' }))`
   padding: 20px;
   padding-top: 60px;
   transition: left 0.4s, width 0.5s;
+  z-index: 100;
 
   li {
     font-style: Verdana;
