@@ -4,12 +4,11 @@ import { Form, Button, Modal } from 'react-bootstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-import api from '../../../services/api';
-import { MoneyInput, TextInput, Combobox } from '../../../components/Form';
+import api from '../../../customers/api';
+import { DateInput, TextInput, Combobox } from '../../../components/Form';
 
-export default function FormService(props) {
-  const [categories, setCategories] = useState([]);
-  const [service, setService] = useState();
+export default function FormCustomer(props) {
+  const [customer, setCustomer] = useState();
 
   const regexMoney = '^[1-9]\\d{0,2}(\\.\\d{3})*(,\\d{2})?$';
 
@@ -20,49 +19,37 @@ export default function FormService(props) {
       .matches(regexMoney, 'Valor inválido.'),
   });
 
-  const { serviceId, handleClose, modalForm } = props;
+  const { customerId, handleClose, modalForm } = props;
 
-  const getService = async id => {
+  const getCustomer = async id => {
     try {
-      const { data: servico } = await api.get(`/service/${id}`);
-      setService(servico);
+      const { data: servico } = await api.get(`/customer/${id}`);
+      setCustomer(servico);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getCategories = useCallback(() => {
-    api
-      .get(`/serviceCategory/all/0`)
-      .then(result => {
-        setCategories(result.data.content);
-      })
-      .catch(error => {
-        console.log(error.message);
-      });
-  }, []);
-
   useEffect(() => {
-    getCategories();
-    if (typeof serviceId !== 'undefined') {
-      getService(serviceId);
+    if (typeof customerId !== 'undefined') {
+      getCustomer(customerId);
     }
-    // console.log(service ? 'service.name' : 'Vazio');
-  }, [getCategories, serviceId]);
+    // console.log(customer ? 'customer.name' : 'Vazio');
+  }, [customerId]);
 
   return (
     <Formik
       enableReinitialize
       initialValues={{
-        nome: service ? service.name : '',
-        descricao: service ? service.description : '',
-        preco: service ? service.price : '',
-        categoria: service ? service.category.id : '1',
+        nome: customer ? customer.name : '',
+        descricao: customer ? customer.description : '',
+        preco: customer ? customer.price : '',
+        categoria: customer ? customer.category.id : '1',
       }}
       validationSchema={formSchema}
       onSubmit={(values, { resetForm }) => {
-        service
-          ? props.setSubmit(values, service.id)
+        customer
+          ? props.setSubmit(values, customer.id)
           : props.setSubmit(values, resetForm);
       }}
     >
@@ -74,6 +61,13 @@ export default function FormService(props) {
           <Form onSubmit={handleSubmit}>
             <Modal.Body>
               <TextInput
+                label="CPF *"
+                name="cpf"
+                value={values.cpf}
+                onChange={handleChange}
+                errors={[errors.cpf, touched.cpf]}
+              />
+              <TextInput
                 label="Nome *"
                 name="nome"
                 placeholder="Ex.: Penteado"
@@ -82,26 +76,18 @@ export default function FormService(props) {
                 errors={[errors.nome, touched.nome]}
               />
               <TextInput
-                label="Descrição"
-                placeholder="Ex.: Penteados de cabelo"
-                name="descricao"
-                value={values.descricao}
+                label="E-mail"
+                name="email"
+                value={values.email}
                 onChange={handleChange}
               />
 
-              <MoneyInput
-                label="Preço *"
-                name="preco"
-                value={values.preco}
+              <DateInput
+                label="Data de Nascimento *"
+                name="dtNascimento"
+                value={values.dtNascimento}
                 onChange={handleChange}
-                errors={[errors.preco, touched.preco]}
-              />
-              <Combobox
-                label="Categoria"
-                name="categoria"
-                onChange={handleChange}
-                value={values.categoria}
-                options={categories}
+                errors={[errors.dtNascimento, touched.dtNascimento]}
               />
             </Modal.Body>
             <Modal.Footer>

@@ -20,14 +20,38 @@ const brlMaskOptions = {
 
 const brlMask = createNumberMask(brlMaskOptions);
 
+const handleValid = props => {
+  const { errors } = props;
+  let className = '';
+  console.log(errors);
+  if (errors) {
+    if (errors[0]) {
+      className = ' is-invalid';
+    }
+    if (!errors[0] && errors[1]) {
+      className = ' is-valid';
+    }
+  }
+  return className;
+};
+
 export function DateInput(props) {
   return (
-    <InputMask
-      className="form-control"
-      mask="99/99/9999"
-      onChange={props.onChange}
-      value={props.value}
-    />
+    <Form.Group>
+      <Form.Label>{props.label}</Form.Label>
+      <InputGroup>
+        <InputMask
+          className={`form-control${handleValid(props)}`}
+          mask="99/99/9999"
+          name={props.name}
+          onChange={props.onChange}
+          value={props.value}
+        />
+        <Form.Control.Feedback type="invalid">
+          {props.errors}
+        </Form.Control.Feedback>
+      </InputGroup>
+    </Form.Group>
   );
 }
 
@@ -36,13 +60,12 @@ export function TextInput(props) {
     <Form.Group>
       <Form.Label>{props.label}</Form.Label>
       <Form.Control
+        className={handleValid(props)}
         type="text"
         name={props.name}
         placeholder={props.placeholder}
         value={props.value}
         onChange={props.onChange}
-        isValid={props.isValid}
-        isInvalid={props.isInvalid}
       />
       <Form.Control.Feedback type="invalid">
         {props.errors}
@@ -52,8 +75,6 @@ export function TextInput(props) {
 }
 
 export function MoneyInput(props) {
-  const isValid = props.isValid ? ' is-valid' : '';
-  const isInvalid = props.isInvalid ? ' is-invalid' : '';
   return (
     <Form.Group>
       <Form.Label>{props.label}</Form.Label>
@@ -62,7 +83,7 @@ export function MoneyInput(props) {
           <InputGroup.Text id="inputGroupPrepend">R$</InputGroup.Text>
         </InputGroup.Prepend>
         <MaskedInput
-          className={`form-control${isValid}${isInvalid}`}
+          className={`form-control${handleValid(props)}`}
           mask={brlMask}
           name={props.name}
           onChange={props.onChange}

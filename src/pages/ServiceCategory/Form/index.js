@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { Form, Button, Modal } from 'react-bootstrap';
@@ -41,9 +42,7 @@ export default function FormServiceCat(props) {
                 placeholder="Ex.: Penteado"
                 value={values.nome}
                 onChange={handleChange}
-                isValid={touched.nome && !errors.nome}
-                isInvalid={!!errors.nome}
-                errors={errors.nome}
+                errors={[errors.nome, touched.nome]}
               />
               <TextInput
                 label="Descriçaõ"

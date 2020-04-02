@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Button } from 'react-bootstrap';
 
-import api from '../../../services/api';
+import api from '../../../customers/api';
 import { Container } from './styles';
 
 import Form from '../Form';
@@ -10,22 +10,22 @@ import { InfoModal, ConfirmDialog } from '../../../components/Modal';
 import Pagination from '../../../components/Pagination';
 
 export default function Main() {
-  const [services, setServices] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [showAddFormModal, setShowAddFormModal] = useState(false);
   const [showEditFormModal, setShowEditFormModal] = useState(false);
   const [showDeleteFormModal, setShowDeleteFormModal] = useState(false);
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [modalResponseContent, setModalResponseContent] = useState();
-  const [serviceUpdate, setServiceUpdate] = useState();
-  const [serviceDelete, setServiceDelete] = useState();
+  const [customerUpdate, setCustomerUpdate] = useState();
+  const [customerDelete, setCustomerDelete] = useState();
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState();
 
-  const getServices = useCallback(() => {
+  const getCustomers = useCallback(() => {
     api
-      .get(`/service/all/${currentPage}`)
+      .get(`/customer/all/${currentPage}`)
       .then(result => {
-        setServices(result.data.content);
+        setCustomers(result.data.content);
         setTotalPages(result.data.totalPages);
       })
       .catch(error => {
@@ -34,8 +34,8 @@ export default function Main() {
   }, [currentPage]);
 
   useEffect(() => {
-    getServices();
-  }, [getServices, currentPage]);
+    getCustomers();
+  }, [getCustomers, currentPage]);
 
   const showHideAddModal = () => {
     setShowAddFormModal(!showAddFormModal);
@@ -44,13 +44,13 @@ export default function Main() {
   const showHideEditModal = id => {
     setShowEditFormModal(!showEditFormModal);
     if (showEditFormModal === false) {
-      setServiceUpdate(id);
+      setCustomerUpdate(id);
     }
   };
 
   const showHideDeleteModal = id => {
     setShowDeleteFormModal(!showDeleteFormModal);
-    setServiceDelete(id);
+    setCustomerDelete(id);
   };
 
   const showHideResponseModal = () => {
@@ -58,7 +58,7 @@ export default function Main() {
   };
 
   const setSubmit = (values, resetForm) => {
-    const service = {
+    const customer = {
       name: values.nome,
       description: values.descricao,
       price: values.preco,
@@ -68,10 +68,10 @@ export default function Main() {
     };
 
     api
-      .post(`/service`, service)
+      .post(`/customer`, customer)
       .then(res => {
         setModalResponseContent(res.data.message);
-        getServices();
+        getCustomers();
         showHideAddModal();
         resetForm();
       })
@@ -90,7 +90,7 @@ export default function Main() {
   };
 
   const setUpdate = (values, id) => {
-    const service = {
+    const customer = {
       name: values.nome,
       description: values.descricao,
       price: values.preco,
@@ -100,10 +100,10 @@ export default function Main() {
     };
 
     api
-      .put(`/service/${id}`, service)
+      .put(`/customer/${id}`, customer)
       .then(res => {
         setModalResponseContent(res.data);
-        getServices();
+        getCustomers();
         showHideEditModal();
       })
       .catch(error => {
@@ -122,10 +122,10 @@ export default function Main() {
 
   const handleDelete = () => {
     api
-      .delete(`/serviceService/${serviceDelete}`)
+      .delete(`/customerCustomer/${customerDelete}`)
       .then(res => {
         setModalResponseContent(res.data);
-        getServices();
+        getCustomers();
         showHideDeleteModal();
       })
       .catch(error => {
@@ -165,28 +165,28 @@ export default function Main() {
           </tr>
         </thead>
         <tbody>
-          {services.map(service => (
-            <tr key={service.id}>
-              <td>{service.name}</td>
-              <td>{service.description}</td>
-              <td>{service.category.name}</td>
+          {customers.map(customer => (
+            <tr key={customer.id}>
+              <td>{customer.name}</td>
+              <td>{customer.description}</td>
+              <td>{customer.category.name}</td>
               <td>
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
-                }).format(service.price)}
+                }).format(customer.price)}
               </td>
               <td>
                 <Button
                   variant="dark"
                   className="btEdit"
-                  onClick={() => showHideEditModal(service.id)}
+                  onClick={() => showHideEditModal(customer.id)}
                 >
                   <i className="fa fa-edit" />
                 </Button>
                 <Button
                   variant="dark"
-                  onClick={() => showHideDeleteModal(service.id)}
+                  onClick={() => showHideDeleteModal(customer.id)}
                 >
                   <i className="fa fa-trash" />
                 </Button>
@@ -206,7 +206,7 @@ export default function Main() {
         setSubmit={setSubmit}
       />
       <Form
-        serviceId={serviceUpdate}
+        customerId={customerUpdate}
         modalForm={showEditFormModal}
         handleClose={showHideEditModal}
         setSubmit={setUpdate}
