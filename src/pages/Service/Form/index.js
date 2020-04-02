@@ -5,13 +5,19 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import api from '../../../services/api';
+import { MoneyInput, TextInput, Combobox } from '../../../components/Form';
 
 export default function FormService(props) {
   const [categories, setCategories] = useState([]);
-  const [service, setService] = useState([]);
+  const [service, setService] = useState();
+
+  const regexMoney = '^[1-9]\\d{0,2}(\\.\\d{3})*(,\\d{2})?$';
 
   const formSchema = Yup.object().shape({
     nome: Yup.string().required('Campo Obrigatório.'),
+    preco: Yup.string()
+      .required('Campo Obrigatório.')
+      .matches(regexMoney, 'Valor inválido.'),
   });
 
   const { serviceId, handleClose, modalForm } = props;
@@ -41,7 +47,7 @@ export default function FormService(props) {
     if (typeof serviceId !== 'undefined') {
       getService(serviceId);
     }
-    console.log(service);
+    // console.log(service ? 'service.name' : 'Vazio');
   }, [getCategories, serviceId]);
 
   return (
@@ -51,12 +57,13 @@ export default function FormService(props) {
         nome: service ? service.name : '',
         descricao: service ? service.description : '',
         preco: service ? service.price : '',
-        categoria: service ? service.category : '',
+        categoria: service ? service.category.id : '1',
       }}
       validationSchema={formSchema}
       onSubmit={(values, { resetForm }) => {
-        service ? props.setSubmit(values, service.id) : props.setSubmit(values);
-        resetForm();
+        service
+          ? props.setSubmit(values, service.id)
+          : props.setSubmit(values, resetForm);
       }}
     >
       {({ handleSubmit, handleChange, values, errors, touched }) => (
@@ -66,61 +73,40 @@ export default function FormService(props) {
           </Modal.Header>
           <Form onSubmit={handleSubmit}>
             <Modal.Body>
-              <Form.Group controlId="inputName">
-                <Form.Label>Nome *</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nome"
-                  placeholder="Ex.: Penteado"
-                  aria-describedby="inputGroupPrepend"
-                  value={values.nome}
-                  onChange={handleChange}
-                  isValid={touched.nome && !errors.nome}
-                  isInvalid={!!errors.nome}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.nome}
-                </Form.Control.Feedback>
-              </Form.Group>
+              <TextInput
+                label="Nome *"
+                name="nome"
+                placeholder="Ex.: Penteado"
+                value={values.nome}
+                onChange={handleChange}
+                isValid={touched.nome && !errors.nome}
+                isInvalid={!!errors.nome}
+                errors={errors.nome}
+              />
+              <TextInput
+                label="Descrição"
+                placeholder="Ex.: Penteados de cabelo"
+                name="descricao"
+                value={values.descricao}
+                onChange={handleChange}
+              />
 
-              <Form.Group controlId="inputDescription">
-                <Form.Label>Descrição</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Ex.: Penteados de cabelo"
-                  name="descricao"
-                  value={values.descricao}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="inputPrice">
-                <Form.Label>Preço</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Ex.: 50,00"
-                  name="preco"
-                  value={values.preco}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="cbCategory">
-                <Form.Label>Categoria</Form.Label>
-                <Form.Control
-                  as="select"
-                  custom="true"
-                  name="categoria"
-                  onChange={handleChange}
-                  value={values.categoria}
-                >
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
+              <MoneyInput
+                label="Preço *"
+                name="preco"
+                value={values.preco}
+                onChange={handleChange}
+                isValid={touched.preco && !errors.preco}
+                isInvalid={!!errors.preco}
+                errors={errors.preco}
+              />
+              <Combobox
+                label="Categoria"
+                name="categoria"
+                onChange={handleChange}
+                value={values.categoria}
+                options={categories}
+              />
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>

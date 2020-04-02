@@ -57,19 +57,23 @@ export default function Main() {
     setShowResponseModal(!showResponseModal);
   };
 
-  const setSubmit = values => {
-    const serviceService = {
+  const setSubmit = (values, resetForm) => {
+    const service = {
       name: values.nome,
       description: values.descricao,
+      price: values.preco,
+      category: {
+        id: values.categoria,
+      },
     };
 
     api
-      .post(`/service`, serviceService)
+      .post(`/service`, service)
       .then(res => {
-        console.log(res.status);
-        setModalResponseContent(res.data);
+        setModalResponseContent(res.data.message);
         getServices();
         showHideAddModal();
+        resetForm();
       })
       .catch(error => {
         if (!error.response) {
@@ -89,12 +93,15 @@ export default function Main() {
     const service = {
       name: values.nome,
       description: values.descricao,
+      price: values.preco,
+      category: {
+        id: values.categoria,
+      },
     };
 
     api
       .put(`/service/${id}`, service)
       .then(res => {
-        console.log(res.status);
         setModalResponseContent(res.data);
         getServices();
         showHideEditModal();
@@ -117,7 +124,6 @@ export default function Main() {
     api
       .delete(`/serviceService/${serviceDelete}`)
       .then(res => {
-        console.log(res.status);
         setModalResponseContent(res.data);
         getServices();
         showHideDeleteModal();

@@ -4,6 +4,8 @@ import { Form, Button, Modal } from 'react-bootstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
+import { TextInput } from '../../../components/Form';
+
 export default function FormServiceCat(props) {
   const formSchema = Yup.object().shape({
     nome: Yup.string().required('Campo Obrigatório.'),
@@ -33,33 +35,23 @@ export default function FormServiceCat(props) {
           </Modal.Header>
           <Form onSubmit={handleSubmit}>
             <Modal.Body>
-              <Form.Group controlId="inputName">
-                <Form.Label>Nome *</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nome"
-                  placeholder="Ex.: Penteado"
-                  aria-describedby="inputGroupPrepend"
-                  value={values.nome}
-                  onChange={handleChange}
-                  isValid={touched.nome && !errors.nome}
-                  isInvalid={!!errors.nome}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.nome}
-                </Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group controlId="inputDescription">
-                <Form.Label>Descrição</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Ex.: Penteados de cabelo"
-                  name="descricao"
-                  value={values.descricao}
-                  onChange={handleChange}
-                />
-              </Form.Group>
+              <TextInput
+                label="Nome *"
+                name="nome"
+                placeholder="Ex.: Penteado"
+                value={values.nome}
+                onChange={handleChange}
+                isValid={touched.nome && !errors.nome}
+                isInvalid={!!errors.nome}
+                errors={errors.nome}
+              />
+              <TextInput
+                label="Descriçaõ"
+                placeholder="Ex.: Penteados de cabelo"
+                name="descricao"
+                value={values.descricao}
+                onChange={handleChange}
+              />
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
