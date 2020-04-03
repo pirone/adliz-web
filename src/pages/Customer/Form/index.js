@@ -4,19 +4,17 @@ import { Form, Button, Modal } from 'react-bootstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-import api from '../../../customers/api';
-import { DateInput, TextInput, Combobox } from '../../../components/Form';
+import api from '../../../services/api';
+import { DateInput, TextInput } from '../../../components/Form';
+import { dateToString } from '../../../utils/date';
 
 export default function FormCustomer(props) {
   const [customer, setCustomer] = useState();
 
-  const regexMoney = '^[1-9]\\d{0,2}(\\.\\d{3})*(,\\d{2})?$';
-
   const formSchema = Yup.object().shape({
+    cpf: Yup.string().required('Campo Obrigatório.'),
     nome: Yup.string().required('Campo Obrigatório.'),
-    preco: Yup.string()
-      .required('Campo Obrigatório.')
-      .matches(regexMoney, 'Valor inválido.'),
+    dtNascimento: Yup.string().required('Campo Obrigatório.'),
   });
 
   const { customerId, handleClose, modalForm } = props;
@@ -53,7 +51,14 @@ export default function FormCustomer(props) {
           : props.setSubmit(values, resetForm);
       }}
     >
-      {({ handleSubmit, handleChange, values, errors, touched }) => (
+      {({
+        handleSubmit,
+        handleChange,
+        values,
+        errors,
+        touched,
+        setFieldValue,
+      }) => (
         <Modal show={modalForm} onHide={handleClose}>
           <Modal.Header closeButton>
             <Modal.Title>Preencha o formulário</Modal.Title>
@@ -86,7 +91,7 @@ export default function FormCustomer(props) {
                 label="Data de Nascimento *"
                 name="dtNascimento"
                 value={values.dtNascimento}
-                onChange={handleChange}
+                onChange={setFieldValue}
                 errors={[errors.dtNascimento, touched.dtNascimento]}
               />
             </Modal.Body>

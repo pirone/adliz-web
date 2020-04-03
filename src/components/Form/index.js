@@ -1,9 +1,15 @@
-import React from 'react';
-import InputMask from 'react-input-mask';
+import React, { useState } from 'react';
 import MaskedInput from 'react-text-mask';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
+import DatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker';
+import pt from 'date-fns/locale/pt';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 import { Form, InputGroup } from 'react-bootstrap';
+
+registerLocale('pt', pt);
+setDefaultLocale('pt');
 
 const brlMaskOptions = {
   prefix: '',
@@ -20,8 +26,7 @@ const brlMaskOptions = {
 
 const brlMask = createNumberMask(brlMaskOptions);
 
-const handleValid = props => {
-  const { errors } = props;
+const handleValid = errors => {
   let className = '';
   console.log(errors);
   if (errors) {
@@ -35,63 +40,66 @@ const handleValid = props => {
   return className;
 };
 
-export function DateInput(props) {
+export function DateInput({ label, name, value, errors, onChange }) {
   return (
     <Form.Group>
-      <Form.Label>{props.label}</Form.Label>
+      <Form.Label>{label}</Form.Label>
       <InputGroup>
-        <InputMask
-          className={`form-control${handleValid(props)}`}
-          mask="99/99/9999"
-          name={props.name}
-          onChange={props.onChange}
-          value={props.value}
+        <DatePicker
+          className={`form-control${handleValid(errors)}`}
+          onChange={val => {
+            onChange(name, val);
+          }}
+          value={value}
+          dateFormat="dd/MM/yyyy"
+          selected={(value && new Date(value)) || null}
         />
-        <Form.Control.Feedback type="invalid">
-          {props.errors}
-        </Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
       </InputGroup>
     </Form.Group>
   );
 }
 
-export function TextInput(props) {
+export function TextInput({
+  label,
+  name,
+  placeholder,
+  value,
+  onChange,
+  errors,
+}) {
   return (
     <Form.Group>
-      <Form.Label>{props.label}</Form.Label>
+      <Form.Label>{label}</Form.Label>
       <Form.Control
-        className={handleValid(props)}
+        className={handleValid(errors)}
         type="text"
-        name={props.name}
-        placeholder={props.placeholder}
-        value={props.value}
-        onChange={props.onChange}
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
       />
-      <Form.Control.Feedback type="invalid">
-        {props.errors}
-      </Form.Control.Feedback>
+      <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
     </Form.Group>
   );
 }
 
-export function MoneyInput(props) {
+export function MoneyInput({ label, name, onChange, value, errors }) {
   return (
     <Form.Group>
-      <Form.Label>{props.label}</Form.Label>
+      <Form.Label>{label}</Form.Label>
       <InputGroup>
         <InputGroup.Prepend>
           <InputGroup.Text id="inputGroupPrepend">R$</InputGroup.Text>
         </InputGroup.Prepend>
         <MaskedInput
-          className={`form-control${handleValid(props)}`}
+          className={`form-control${handleValid(errors)}`}
           mask={brlMask}
-          name={props.name}
-          onChange={props.onChange}
-          value={props.value}
+          name={name}
+          onChange={onChange}
+          value={value}
         />
-        <Form.Control.Feedback type="invalid">
-          {props.errors}
-        </Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
       </InputGroup>
     </Form.Group>
   );

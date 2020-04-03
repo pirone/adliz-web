@@ -14,21 +14,21 @@ export default function Menu(props) {
           </a>
         </li>
         <li className="nav-item">
-          <a href="/serviceCategory" className="nav-link">
+          <a href="/categoriasServico" className="nav-link">
             <i className="fa fa-address-card" />
             Categorias de Serviço
           </a>
         </li>
         <li className="nav-item">
-          <a href="/services" className="nav-link">
+          <a href="/servicos" className="nav-link">
             <i className="fa fa-cubes" />
             Serviços
           </a>
         </li>
         <li className="nav-item">
-          <a href="/" className="nav-link">
+          <a href="/clientes" className="nav-link">
             <i className="fa fa-picture-o" />
-            Gallery
+            Clientes
           </a>
         </li>
       </ul>

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Button } from 'react-bootstrap';
 
-import api from '../../../customers/api';
+import api from '../../../services/api';
 import { Container } from './styles';
 
 import Form from '../Form';
@@ -146,7 +146,7 @@ export default function Main() {
     <Container>
       <div className="topbox">
         <div className="pageTitle">
-          <h1>Serviços</h1>
+          <h1>Clientes</h1>
         </div>
         <div className="pageButton">
           <Button variant="dark" type="button" onClick={showHideAddModal}>
