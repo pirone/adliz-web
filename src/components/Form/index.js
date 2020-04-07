@@ -41,7 +41,7 @@ const handleValid = errors => {
   return className;
 };
 
-export function DateInput({
+export function DateComponent({
   label,
   name,
   value,
@@ -112,6 +112,39 @@ export function MoneyInput({ label, name, onChange, value, errors }) {
   );
 }
 
+export function PhoneInput({ label, name, onChange, value, errors }) {
+  return (
+    <Form.Group>
+      <Form.Label>{label}</Form.Label>
+      <InputGroup>
+        <MaskedInput
+          className={`form-control${handleValid(errors)}`}
+          mask={[
+            '(',
+            /\d/,
+            /\d/,
+            ')',
+            /\d/,
+            /\d/,
+            /\d/,
+            /\d/,
+            /\d/,
+            '-',
+            /\d/,
+            /\d/,
+            /\d/,
+            /\d/,
+          ]}
+          name={name}
+          onChange={onChange}
+          value={value}
+        />
+        <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
+      </InputGroup>
+    </Form.Group>
+  );
+}
+
 export function Combobox({ label, name, onChange, options, value }) {
   return (
     <Form.Group>
@@ -159,6 +192,8 @@ export function CpfInput({ label, errors, onChange, name, value }) {
           name={name}
           onChange={onChange}
           value={value}
+          showMask="true"
+          guide="false"
         />
         <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
       </InputGroup>

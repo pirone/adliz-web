@@ -67,7 +67,7 @@ export default function FormService(props) {
       }}
     >
       {({ handleSubmit, handleChange, values, errors, touched }) => (
-        <Modal show={modalForm} onHide={handleClose}>
+        <Modal show={modalForm} onHide={handleClose} backdrop="static">
           <Modal.Header closeButton>
             <Modal.Title>Preencha o formulário</Modal.Title>
           </Modal.Header>

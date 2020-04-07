@@ -5,13 +5,22 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import api from '../../../services/api';
-import { DateInput, TextInput, CpfInput } from '../../../components/Form';
+import {
+  DateComponent,
+  TextInput,
+  CpfInput,
+  PhoneInput,
+} from '../../../components/Form';
 
 export default function FormCustomer(props) {
   const [customer, setCustomer] = useState();
 
+  const regexCpf = '[0-9]{3}.?[0-9]{3}.?[0-9]{3}-?[0-9]{2}';
+
   const formSchema = Yup.object().shape({
-    cpf: Yup.string().required('Campo Obrigatório.'),
+    cpf: Yup.string()
+      .required('Campo Obrigatório.')
+      .matches(regexCpf, 'Valor Inválido'),
     nome: Yup.string().required('Campo Obrigatório.'),
     dtNascimento: Yup.string().required('Campo Obrigatório.'),
   });
@@ -43,12 +52,14 @@ export default function FormCustomer(props) {
         descricao: customer ? customer.person.description : '',
         email: customer ? customer.person.email : '',
         dtNascimento: customer ? customer.person.birth_date : '',
+        phone:
+          customer && customer.person.phones ? customer.person.phones[0] : '',
       }}
       validationSchema={formSchema}
-      onSubmit={(values, { resetForm }) => {
+      onSubmit={(values, actions) => {
         customer
-          ? props.setSubmit(values, customer.id)
-          : props.setSubmit(values, resetForm);
+          ? props.setSubmit(values, actions, customer.id)
+          : props.setSubmit(values, actions);
       }}
     >
       {({
@@ -58,8 +69,9 @@ export default function FormCustomer(props) {
         errors,
         touched,
         setFieldValue,
+        isSubmitting,
       }) => (
-        <Modal show={modalForm} onHide={handleClose}>
+        <Modal show={modalForm} onHide={handleClose} backdrop="static">
           <Modal.Header closeButton>
             <Modal.Title>Preencha o formulário</Modal.Title>
           </Modal.Header>
@@ -87,21 +99,36 @@ export default function FormCustomer(props) {
                 onChange={handleChange}
               />
 
-              <DateInput
+              <DateComponent
                 label="Data de Nascimento *"
                 name="dtNascimento"
                 value={values.dtNascimento}
                 setFieldValue={setFieldValue}
                 errors={[errors.dtNascimento, touched.dtNascimento]}
               />
+              <PhoneInput
+                label="Telefone"
+                name="phone"
+                value={values.phone}
+                onChange={handleChange}
+                errors={[errors.phone, touched.phone]}
+              />
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Cancelar
-              </Button>
-              <Button variant="primary" type="submit">
-                Enviar
-              </Button>
+              {isSubmitting ? (
+                <Button variant="primary">
+                  <i className="fa fa-spinner fa-spin" />
+                </Button>
+              ) : (
+                <>
+                  <Button variant="secondary" onClick={handleClose}>
+                    Cancelar
+                  </Button>
+                  <Button variant="primary" type="submit">
+                    Enviar
+                  </Button>
+                </>
+              )}
             </Modal.Footer>
           </Form>
         </Modal>

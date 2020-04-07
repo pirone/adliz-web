@@ -11,15 +11,16 @@ export const InfoModal = ({ show, title, content, onHide }) => (
     aria-labelledby="contained-modal-title-vcenter"
     onHide={onHide}
     centered
+    backdrop="static"
   >
     <Modal.Header closeButton>
       <Modal.Title id="contained-modal-title-vcenter">{title}</Modal.Title>
     </Modal.Header>
     <Modal.Body>
-      <p>{content}</p>
+      <p>{show === true ? content : 'Aguardando resultado...'}</p>
     </Modal.Body>
     <Modal.Footer>
-      <Button onClick={onHide}>Close</Button>
+      <Button onClick={onHide}>Fechar</Button>
     </Modal.Footer>
   </Modal>
 );
@@ -43,6 +44,7 @@ export const ConfirmDialog = ({ show, title, content, onHide, confirm }) => (
     aria-labelledby="contained-modal-title-vcenter"
     onHide={onHide}
     centered
+    backdrop="static"
   >
     <Modal.Header closeButton>
       <Modal.Title id="contained-modal-title-vcenter">{title}</Modal.Title>

@@ -58,7 +58,7 @@ export default function Main() {
     setShowResponseModal(!showResponseModal);
   };
 
-  const setSubmit = (values, resetForm) => {
+  const setSubmit = (values, actions) => {
     const customer = {
       person: {
         name: values.nome,
@@ -68,6 +68,7 @@ export default function Main() {
           .toDate()
           .getTime(),
       },
+      phones: [values.phone],
     };
 
     api
@@ -76,7 +77,7 @@ export default function Main() {
         setModalResponseContent(res.data.message);
         getCustomers();
         showHideAddModal();
-        resetForm();
+        actions.resetForm();
       })
       .catch(error => {
         if (!error.response) {
@@ -87,12 +88,14 @@ export default function Main() {
         } else {
           setModalResponseContent(error.response.data.message);
         }
+      })
+      .finally(() => {
+        setShowResponseModal(true);
+        actions.setSubmitting(false);
       });
-
-    setShowResponseModal(true);
   };
 
-  const setUpdate = (values, id) => {
+  const setUpdate = (values, actions, id) => {
     const customer = {
       person: {
         name: values.nome,
@@ -101,6 +104,7 @@ export default function Main() {
         birth_date: moment(values.dtNascimento, 'DD/MM/YYYY')
           .toDate()
           .getTime(),
+        phones: [values.phone],
       },
     };
 
@@ -120,9 +124,11 @@ export default function Main() {
         } else {
           setModalResponseContent(error.response.data.message);
         }
+      })
+      .finally(() => {
+        setShowResponseModal(true);
+        actions.setSubmitting(false);
       });
-
-    setShowResponseModal(true);
   };
 
   const handleDelete = () => {
@@ -165,7 +171,7 @@ export default function Main() {
             <th>CPF</th>
             <th>Nome</th>
             <th>E-mail</th>
-            <th>Data de Nacimento</th>
+            <th>Data de Nascimento</th>
             <th className="actions">Ações</th>
           </tr>
         </thead>
