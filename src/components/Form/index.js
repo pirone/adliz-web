@@ -4,6 +4,8 @@ import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import DatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker';
 import pt from 'date-fns/locale/pt';
 
+import moment from 'moment';
+
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { Form, InputGroup } from 'react-bootstrap';
@@ -28,7 +30,6 @@ const brlMask = createNumberMask(brlMaskOptions);
 
 const handleValid = errors => {
   let className = '';
-  console.log(errors);
   if (errors) {
     if (errors[0]) {
       className = ' is-invalid';
@@ -40,21 +41,27 @@ const handleValid = errors => {
   return className;
 };
 
-export function DateInput({ label, name, value, errors, onChange }) {
+export function DateInput({
+  label,
+  name,
+  value,
+  errors,
+  onChange,
+  setFieldValue,
+}) {
   return (
     <Form.Group>
       <Form.Label>{label}</Form.Label>
       <InputGroup>
         <DatePicker
+          name={name}
           className={`form-control${handleValid(errors)}`}
-          onChange={val => {
-            onChange(name, val);
-          }}
-          value={value}
+          onChange={date => setFieldValue(name, date)}
           dateFormat="dd/MM/yyyy"
-          selected={(value && new Date(value)) || null}
+          selected={
+            (value && new Date(moment(value, 'DD/MM/YYYY').toDate())) || null
+          }
         />
-        <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
       </InputGroup>
     </Form.Group>
   );
@@ -105,23 +112,56 @@ export function MoneyInput({ label, name, onChange, value, errors }) {
   );
 }
 
-export function Combobox(props) {
+export function Combobox({ label, name, onChange, options, value }) {
   return (
     <Form.Group>
-      <Form.Label>{props.label}</Form.Label>
+      <Form.Label>{label}</Form.Label>
       <Form.Control
         as="select"
         custom="true"
-        name={props.name}
-        onChange={props.onChange}
-        value={props.value}
+        name={name}
+        onChange={onChange}
+        value={value}
       >
-        {props.options.map(opt => (
+        {options.map(opt => (
           <option key={opt.id} value={opt.id}>
             {opt.name}
           </option>
         ))}
       </Form.Control>
+    </Form.Group>
+  );
+}
+
+export function CpfInput({ label, errors, onChange, name, value }) {
+  return (
+    <Form.Group>
+      <Form.Label>{label}</Form.Label>
+      <InputGroup>
+        <MaskedInput
+          className={`form-control${handleValid(errors)}`}
+          mask={[
+            /\d/,
+            /\d/,
+            /\d/,
+            '.',
+            /\d/,
+            /\d/,
+            /\d/,
+            '.',
+            /\d/,
+            /\d/,
+            /\d/,
+            '-',
+            /\d/,
+            /\d/,
+          ]}
+          name={name}
+          onChange={onChange}
+          value={value}
+        />
+        <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
+      </InputGroup>
     </Form.Group>
   );
 }

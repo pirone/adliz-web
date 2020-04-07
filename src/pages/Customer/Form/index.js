@@ -5,8 +5,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import api from '../../../services/api';
-import { DateInput, TextInput } from '../../../components/Form';
-import { dateToString } from '../../../utils/date';
+import { DateInput, TextInput, CpfInput } from '../../../components/Form';
 
 export default function FormCustomer(props) {
   const [customer, setCustomer] = useState();
@@ -21,8 +20,8 @@ export default function FormCustomer(props) {
 
   const getCustomer = async id => {
     try {
-      const { data: servico } = await api.get(`/customer/${id}`);
-      setCustomer(servico);
+      const { data: cliente } = await api.get(`/customer/${id}`);
+      setCustomer(cliente);
     } catch (error) {
       console.log(error);
     }
@@ -39,10 +38,11 @@ export default function FormCustomer(props) {
     <Formik
       enableReinitialize
       initialValues={{
-        nome: customer ? customer.name : '',
-        descricao: customer ? customer.description : '',
-        preco: customer ? customer.price : '',
-        categoria: customer ? customer.category.id : '1',
+        nome: customer ? customer.person.name : '',
+        cpf: customer ? customer.person.cpf : '',
+        descricao: customer ? customer.person.description : '',
+        email: customer ? customer.person.email : '',
+        dtNascimento: customer ? customer.person.birth_date : '',
       }}
       validationSchema={formSchema}
       onSubmit={(values, { resetForm }) => {
@@ -65,7 +65,7 @@ export default function FormCustomer(props) {
           </Modal.Header>
           <Form onSubmit={handleSubmit}>
             <Modal.Body>
-              <TextInput
+              <CpfInput
                 label="CPF *"
                 name="cpf"
                 value={values.cpf}
@@ -91,7 +91,7 @@ export default function FormCustomer(props) {
                 label="Data de Nascimento *"
                 name="dtNascimento"
                 value={values.dtNascimento}
-                onChange={setFieldValue}
+                setFieldValue={setFieldValue}
                 errors={[errors.dtNascimento, touched.dtNascimento]}
               />
             </Modal.Body>

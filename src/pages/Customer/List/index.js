@@ -1,6 +1,7 @@
 /* eslint-disable react/prefer-stateless-function */
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Button } from 'react-bootstrap';
+import moment from 'moment';
 
 import api from '../../../services/api';
 import { Container } from './styles';
@@ -59,11 +60,13 @@ export default function Main() {
 
   const setSubmit = (values, resetForm) => {
     const customer = {
-      name: values.nome,
-      description: values.descricao,
-      price: values.preco,
-      category: {
-        id: values.categoria,
+      person: {
+        name: values.nome,
+        email: values.email,
+        cpf: values.cpf,
+        birth_date: moment(values.dtNascimento, 'DD/MM/YYYY')
+          .toDate()
+          .getTime(),
       },
     };
 
@@ -91,11 +94,13 @@ export default function Main() {
 
   const setUpdate = (values, id) => {
     const customer = {
-      name: values.nome,
-      description: values.descricao,
-      price: values.preco,
-      category: {
-        id: values.categoria,
+      person: {
+        name: values.nome,
+        email: values.email,
+        cpf: values.cpf,
+        birth_date: moment(values.dtNascimento, 'DD/MM/YYYY')
+          .toDate()
+          .getTime(),
       },
     };
 
@@ -157,25 +162,20 @@ export default function Main() {
       <Table responsive>
         <thead>
           <tr>
+            <th>CPF</th>
             <th>Nome</th>
-            <th>Descrição</th>
-            <th>Categoria</th>
-            <th>Preço</th>
+            <th>E-mail</th>
+            <th>Data de Nacimento</th>
             <th className="actions">Ações</th>
           </tr>
         </thead>
         <tbody>
           {customers.map(customer => (
             <tr key={customer.id}>
-              <td>{customer.name}</td>
-              <td>{customer.description}</td>
-              <td>{customer.category.name}</td>
-              <td>
-                {new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }).format(customer.price)}
-              </td>
+              <td>{customer.person.cpf}</td>
+              <td>{customer.person.name}</td>
+              <td>{customer.person.email}</td>
+              <td>{customer.person.birth_date}</td>
               <td>
                 <Button
                   variant="dark"
