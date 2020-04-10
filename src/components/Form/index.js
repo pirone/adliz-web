@@ -124,6 +124,7 @@ export function PhoneInput({ label, name, onChange, value, errors }) {
             /\d/,
             /\d/,
             ')',
+            ' ',
             /\d/,
             /\d/,
             /\d/,
@@ -138,6 +139,8 @@ export function PhoneInput({ label, name, onChange, value, errors }) {
           name={name}
           onChange={onChange}
           value={value}
+          showMask="true"
+          guide="false"
         />
         <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
       </InputGroup>

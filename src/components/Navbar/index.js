@@ -31,6 +31,12 @@ export default function Menu(props) {
             Clientes
           </a>
         </li>
+        <li className="nav-item">
+          <a href="/empregados" className="nav-link">
+            <i className="fa fa-picture-o" />
+            Empregados
+          </a>
+        </li>
       </ul>
     </Nav>
   );

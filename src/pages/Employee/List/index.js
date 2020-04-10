@@ -11,22 +11,22 @@ import { InfoModal, ConfirmDialog } from '../../../components/Modal';
 import Pagination from '../../../components/Pagination';
 
 export default function Main() {
-  const [customers, setCustomers] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [showAddFormModal, setShowAddFormModal] = useState(false);
   const [showEditFormModal, setShowEditFormModal] = useState(false);
   const [showDeleteFormModal, setShowDeleteFormModal] = useState(false);
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [modalResponseContent, setModalResponseContent] = useState();
-  const [customerUpdate, setCustomerUpdate] = useState();
-  const [customerDelete, setCustomerDelete] = useState();
+  const [employeeUpdate, setEmployeeUpdate] = useState();
+  const [employeeDelete, setEmployeeDelete] = useState();
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState();
 
-  const getCustomers = useCallback(() => {
+  const getEmployees = useCallback(() => {
     api
-      .get(`/customer/all/${currentPage}`)
+      .get(`/employee/all/${currentPage}`)
       .then(result => {
-        setCustomers(result.data.content);
+        setEmployees(result.data.content);
         setTotalPages(result.data.totalPages);
       })
       .catch(error => {
@@ -35,8 +35,8 @@ export default function Main() {
   }, [currentPage]);
 
   useEffect(() => {
-    getCustomers();
-  }, [getCustomers, currentPage]);
+    getEmployees();
+  }, [getEmployees, currentPage]);
 
   const showHideAddModal = () => {
     setShowAddFormModal(!showAddFormModal);
@@ -45,13 +45,13 @@ export default function Main() {
   const showHideEditModal = id => {
     setShowEditFormModal(!showEditFormModal);
     if (showEditFormModal === false) {
-      setCustomerUpdate(id);
+      setEmployeeUpdate(id);
     }
   };
 
   const showHideDeleteModal = id => {
     setShowDeleteFormModal(!showDeleteFormModal);
-    setCustomerDelete(id);
+    setEmployeeDelete(id);
   };
 
   const showHideResponseModal = () => {
@@ -59,7 +59,7 @@ export default function Main() {
   };
 
   const setSubmit = (values, actions) => {
-    const customer = {
+    const employee = {
       person: {
         name: values.nome,
         email: values.email,
@@ -73,10 +73,10 @@ export default function Main() {
     };
 
     api
-      .post(`/customer`, customer)
+      .post(`/employee`, employee)
       .then(res => {
         setModalResponseContent(res.data.message);
-        getCustomers();
+        getEmployees();
         showHideAddModal();
         actions.resetForm();
       })
@@ -97,7 +97,7 @@ export default function Main() {
   };
 
   const setUpdate = (values, actions, id) => {
-    const customer = {
+    const employee = {
       person: {
         name: values.nome,
         email: values.email,
@@ -111,10 +111,10 @@ export default function Main() {
     };
 
     api
-      .put(`/customer/${id}`, customer)
+      .put(`/employee/${id}`, employee)
       .then(res => {
         setModalResponseContent(res.data);
-        getCustomers();
+        getEmployees();
         showHideEditModal();
       })
       .catch(error => {
@@ -135,10 +135,10 @@ export default function Main() {
 
   const handleDelete = () => {
     api
-      .delete(`/customerCustomer/${customerDelete}`)
+      .delete(`/employee/${employeeDelete}`)
       .then(res => {
         setModalResponseContent(res.data);
-        getCustomers();
+        getEmployees();
         showHideDeleteModal();
       })
       .catch(error => {
@@ -159,7 +159,7 @@ export default function Main() {
     <Container>
       <div className="topbox">
         <div className="pageTitle">
-          <h1>Clientes</h1>
+          <h1>Empregados</h1>
         </div>
         <div className="pageButton">
           <Button variant="dark" type="button" onClick={showHideAddModal}>
@@ -178,23 +178,23 @@ export default function Main() {
           </tr>
         </thead>
         <tbody>
-          {customers.map(customer => (
-            <tr key={customer.id}>
-              <td>{customer.person.cpf}</td>
-              <td>{customer.person.name}</td>
-              <td>{customer.person.email}</td>
-              <td>{customer.person.birth_date}</td>
+          {employees.map(employee => (
+            <tr key={employee.id}>
+              <td>{employee.person.cpf}</td>
+              <td>{employee.person.name}</td>
+              <td>{employee.person.email}</td>
+              <td>{employee.person.birth_date}</td>
               <td>
                 <Button
                   variant="dark"
                   className="btEdit"
-                  onClick={() => showHideEditModal(customer.id)}
+                  onClick={() => showHideEditModal(employee.id)}
                 >
                   <i className="fa fa-edit" />
                 </Button>
                 <Button
                   variant="dark"
-                  onClick={() => showHideDeleteModal(customer.id)}
+                  onClick={() => showHideDeleteModal(employee.id)}
                 >
                   <i className="fa fa-trash" />
                 </Button>
@@ -214,7 +214,7 @@ export default function Main() {
         setSubmit={setSubmit}
       />
       <Form
-        customerId={customerUpdate}
+        employeeId={employeeUpdate}
         modalForm={showEditFormModal}
         handleClose={showHideEditModal}
         setSubmit={setUpdate}

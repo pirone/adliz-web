@@ -12,8 +12,8 @@ import {
   PhoneInput,
 } from '../../../components/Form';
 
-export default function FormCustomer(props) {
-  const [customer, setCustomer] = useState();
+export default function FormEmployee(props) {
+  const [employee, setEmployee] = useState();
 
   const regexCpf = '[0-9]{3}.?[0-9]{3}.?[0-9]{3}-?[0-9]{2}';
   const regexPhone = '\\([1-9][0-9]\\) ([1-9]{1})?[0-9]{4}-[0-9]{4}';
@@ -28,46 +28,46 @@ export default function FormCustomer(props) {
     phone: Yup.string().matches(regexPhone, 'Telefone inválido'),
   });
 
-  const { customerId, handleClose, modalForm } = props;
+  const { employeeId, handleClose, modalForm } = props;
 
-  const getCustomer = async id => {
+  const getEmployee = async id => {
     try {
-      const { data: cliente } = await api.get(`/customer/${id}`);
-      setCustomer(cliente);
+      const { data: empregado } = await api.get(`/employee/${id}`);
+      setEmployee(empregado);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    if (typeof customerId !== 'undefined') {
-      getCustomer(customerId);
+    if (typeof employeeId !== 'undefined') {
+      getEmployee(employeeId);
     }
-    // console.log(customer ? 'customer.name' : 'Vazio');
-  }, [customerId]);
+    // console.log(employee ? 'employee.name' : 'Vazio');
+  }, [employeeId]);
 
   return (
     <Formik
       enableReinitialize
       initialValues={{
-        nome: customer ? customer.person.name : '',
-        cpf: customer ? customer.person.cpf : '',
-        descricao: customer ? customer.person.description : '',
-        email: customer ? customer.person.email : '',
-        dtNascimento: customer ? customer.person.birth_date : '',
+        nome: employee ? employee.person.name : '',
+        cpf: employee ? employee.person.cpf : '',
+        descricao: employee ? employee.person.description : '',
+        email: employee ? employee.person.email : '',
+        dtNascimento: employee ? employee.person.birth_date : '',
         phone:
-          customer && customer.person.phones.length
-            ? customer.person.phones[0]
+          employee && employee.person.phones.length
+            ? employee.person.phones[0]
             : '',
         endereco:
-          customer && customer.person.adresses.length
-            ? customer.person.adresses[0]
+          employee && employee.person.adresses.length
+            ? employee.person.adresses[0]
             : '',
       }}
       validationSchema={formSchema}
       onSubmit={(values, actions) => {
-        customer
-          ? props.setSubmit(values, actions, customer.id)
+        employee
+          ? props.setSubmit(values, actions, employee.id)
           : props.setSubmit(values, actions);
       }}
     >
