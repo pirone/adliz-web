@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Modal } from 'react-bootstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -10,6 +10,7 @@ import {
   TextInput,
   CpfInput,
   PhoneInput,
+  PercentInput,
 } from '../../../components/Form';
 
 export default function FormEmployee(props) {
@@ -26,6 +27,7 @@ export default function FormEmployee(props) {
     dtNascimento: Yup.string().required('Campo Obrigatório.'),
     email: Yup.string().email('Email inválido.'),
     phone: Yup.string().matches(regexPhone, 'Telefone inválido'),
+    comissao: Yup.number().required('Campo Obrigatório'),
   });
 
   const { employeeId, handleClose, modalForm } = props;
@@ -63,6 +65,7 @@ export default function FormEmployee(props) {
           employee && employee.person.adresses.length
             ? employee.person.adresses[0]
             : '',
+        comissao: employee ? employee.comissionRate : '',
       }}
       validationSchema={formSchema}
       onSubmit={(values, actions) => {
@@ -100,6 +103,13 @@ export default function FormEmployee(props) {
                 value={values.nome}
                 onChange={handleChange}
                 errors={[errors.nome, touched.nome]}
+              />
+              <PercentInput
+                label="Comissão"
+                name="comissao"
+                value={values.comissao}
+                onChange={handleChange}
+                errors={[errors.comissao, touched.comissao]}
               />
               <TextInput
                 label="E-mail"

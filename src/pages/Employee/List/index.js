@@ -70,6 +70,7 @@ export default function Main() {
         phones: [values.phone],
         adresses: [values.endereco],
       },
+      comissionRate: values.comissao,
     };
 
     api
@@ -108,6 +109,7 @@ export default function Main() {
         phones: [values.phone],
         adresses: [values.endereco],
       },
+      comissionRate: values.comissao,
     };
 
     api
@@ -174,6 +176,7 @@ export default function Main() {
             <th>Nome</th>
             <th>E-mail</th>
             <th>Data de Nascimento</th>
+            <th>Percentual de Comissão</th>
             <th className="actions">Ações</th>
           </tr>
         </thead>
@@ -184,6 +187,7 @@ export default function Main() {
               <td>{employee.person.name}</td>
               <td>{employee.person.email}</td>
               <td>{employee.person.birth_date}</td>
+              <td>{employee.comissionRate}</td>
               <td>
                 <Button
                   variant="dark"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MaskedInput from 'react-text-mask';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import DatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker';
@@ -26,7 +26,21 @@ const brlMaskOptions = {
   allowLeadingZeroes: false,
 };
 
+const percentMaskOptions = {
+  prefix: '',
+  suffix: '',
+  includeThousandsSeparator: true,
+  thousandsSeparatorSymbol: '.',
+  allowDecimal: true,
+  decimalSymbol: ',',
+  decimalLimit: 2, // how many digits allowed after the decimal
+  integerLimit: 3, // limit length of integer numbers
+  allowNegative: false,
+  allowLeadingZeroes: false,
+};
+
 const brlMask = createNumberMask(brlMaskOptions);
+const percentMask = createNumberMask(percentMaskOptions);
 
 const handleValid = errors => {
   let className = '';
@@ -102,6 +116,27 @@ export function MoneyInput({ label, name, onChange, value, errors }) {
         <MaskedInput
           className={`form-control${handleValid(errors)}`}
           mask={brlMask}
+          name={name}
+          onChange={onChange}
+          value={value}
+        />
+        <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
+      </InputGroup>
+    </Form.Group>
+  );
+}
+
+export function PercentInput({ label, name, onChange, value, errors }) {
+  return (
+    <Form.Group>
+      <Form.Label>{label}</Form.Label>
+      <InputGroup>
+        <InputGroup.Prepend>
+          <InputGroup.Text id="inputGroupPrepend">%</InputGroup.Text>
+        </InputGroup.Prepend>
+        <MaskedInput
+          className={`form-control percent${handleValid(errors)}`}
+          mask={percentMask}
           name={name}
           onChange={onChange}
           value={value}

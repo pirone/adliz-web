@@ -46,4 +46,8 @@ export default createGlobalStyle`
     border-color: #007bff;
   }
 
+  .percent {
+    text-align: right;
+  }
+
 `;
