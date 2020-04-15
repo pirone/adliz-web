@@ -1,4 +1,3 @@
-/* eslint-disable react/prefer-stateless-function */
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Button } from 'react-bootstrap';
 
@@ -8,23 +7,23 @@ import Form from '../Form';
 import { InfoModal, ConfirmDialog } from '../../../components/Modal';
 import Pagination from '../../../components/Pagination';
 
-export default function Main() {
-  const [categories, setCategories] = useState([]);
+export default function EntryList() {
+  const [services, setServices] = useState([]);
   const [showAddFormModal, setShowAddFormModal] = useState(false);
   const [showEditFormModal, setShowEditFormModal] = useState(false);
   const [showDeleteFormModal, setShowDeleteFormModal] = useState(false);
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [modalResponseContent, setModalResponseContent] = useState();
-  const [categoryUpdate, setCategoryUpdate] = useState();
-  const [categoryDelete, setCategoryDelete] = useState();
+  const [serviceUpdate, setServiceUpdate] = useState();
+  const [serviceDelete, setServiceDelete] = useState();
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState();
 
-  const getCategories = useCallback(() => {
+  const getServices = useCallback(() => {
     api
-      .get(`/serviceCategory/all/${currentPage}`)
+      .get(`/service/all/${currentPage}`)
       .then(result => {
-        setCategories(result.data.content);
+        setServices(result.data.content);
         setTotalPages(result.data.totalPages);
       })
       .catch(error => {
@@ -32,18 +31,9 @@ export default function Main() {
       });
   }, [currentPage]);
 
-  const getCategory = async id => {
-    try {
-      const { data: category } = await api.get(`/serviceCategory/${id}`);
-      setCategoryUpdate(category);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    getCategories();
-  }, [getCategories, currentPage]);
+    getServices();
+  }, [getServices, currentPage]);
 
   const showHideAddModal = () => {
     setShowAddFormModal(!showAddFormModal);
@@ -52,32 +42,36 @@ export default function Main() {
   const showHideEditModal = id => {
     setShowEditFormModal(!showEditFormModal);
     if (showEditFormModal === false) {
-      getCategory(id);
+      setServiceUpdate(id);
     }
   };
 
   const showHideDeleteModal = id => {
     setShowDeleteFormModal(!showDeleteFormModal);
-    setCategoryDelete(id);
+    setServiceDelete(id);
   };
 
   const showHideResponseModal = () => {
     setShowResponseModal(!showResponseModal);
   };
 
-  const setSubmit = values => {
-    const serviceCategory = {
+  const setSubmit = (values, resetForm) => {
+    const service = {
       name: values.nome,
       description: values.descricao,
+      price: values.preco,
+      category: {
+        id: values.categoria,
+      },
     };
 
     api
-      .post(`/serviceCategory`, serviceCategory)
+      .post(`/service`, service)
       .then(res => {
-        console.log(res.status);
-        setModalResponseContent(res.data);
-        getCategories();
+        setModalResponseContent(res.data.message);
+        getServices();
         showHideAddModal();
+        resetForm();
       })
       .catch(error => {
         if (!error.response) {
@@ -94,17 +88,20 @@ export default function Main() {
   };
 
   const setUpdate = (values, id) => {
-    const serviceCategory = {
+    const service = {
       name: values.nome,
       description: values.descricao,
+      price: values.preco,
+      category: {
+        id: values.categoria,
+      },
     };
 
     api
-      .put(`/serviceCategory/${id}`, serviceCategory)
+      .put(`/service/${id}`, service)
       .then(res => {
-        console.log(res.status);
         setModalResponseContent(res.data);
-        getCategories();
+        getServices();
         showHideEditModal();
       })
       .catch(error => {
@@ -123,11 +120,10 @@ export default function Main() {
 
   const handleDelete = () => {
     api
-      .delete(`/serviceCategory/${categoryDelete}`)
+      .delete(`/serviceService/${serviceDelete}`)
       .then(res => {
-        console.log(res.status);
         setModalResponseContent(res.data);
-        getCategories();
+        getServices();
         showHideDeleteModal();
       })
       .catch(error => {
@@ -148,7 +144,7 @@ export default function Main() {
     <div className="container">
       <div className="topbox">
         <div className="pageTitle">
-          <h1>Categorias de Serviço</h1>
+          <h1>Serviços</h1>
         </div>
         <div className="pageButton">
           <Button variant="dark" type="button" onClick={showHideAddModal}>
@@ -161,25 +157,34 @@ export default function Main() {
           <tr>
             <th>Nome</th>
             <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Preço</th>
             <th className="actions">Ações</th>
           </tr>
         </thead>
         <tbody>
-          {categories.map(cat => (
-            <tr key={cat.id}>
-              <td>{cat.name}</td>
-              <td>{cat.description}</td>
+          {services.map(service => (
+            <tr key={service.id}>
+              <td>{service.name}</td>
+              <td>{service.description}</td>
+              <td>{service.category.name}</td>
+              <td>
+                {new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                }).format(service.price)}
+              </td>
               <td>
                 <Button
                   variant="dark"
                   className="btEdit"
-                  onClick={() => showHideEditModal(cat.id)}
+                  onClick={() => showHideEditModal(service.id)}
                 >
                   <i className="fa fa-edit" />
                 </Button>
                 <Button
                   variant="dark"
-                  onClick={() => showHideDeleteModal(cat.id)}
+                  onClick={() => showHideDeleteModal(service.id)}
                 >
                   <i className="fa fa-trash" />
                 </Button>
@@ -199,7 +204,7 @@ export default function Main() {
         setSubmit={setSubmit}
       />
       <Form
-        serviceCategory={categoryUpdate}
+        serviceId={serviceUpdate}
         modalForm={showEditFormModal}
         handleClose={showHideEditModal}
         setSubmit={setUpdate}

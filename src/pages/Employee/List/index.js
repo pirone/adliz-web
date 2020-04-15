@@ -4,7 +4,6 @@ import { Table, Button } from 'react-bootstrap';
 import moment from 'moment';
 
 import api from '../../../services/api';
-import { Container } from './styles';
 
 import Form from '../Form';
 import { InfoModal, ConfirmDialog } from '../../../components/Modal';
@@ -158,7 +157,7 @@ export default function Main() {
   };
 
   return (
-    <Container>
+    <div className="container">
       <div className="topbox">
         <div className="pageTitle">
           <h1>Empregados</h1>
@@ -236,6 +235,6 @@ export default function Main() {
         onHide={showHideDeleteModal}
         confirm={handleDelete}
       />
-    </Container>
+    </div>
   );
 }

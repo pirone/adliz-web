@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  max-width: 1000px;
+  max-width: 1200px;
   background: #fff;
   box-shadow: 0 0 1px rgba(0, 0, 0.1);
   padding: 30px;

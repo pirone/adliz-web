@@ -88,7 +88,6 @@ export default function FormService(props) {
                 value={values.descricao}
                 onChange={handleChange}
               />
-
               <MoneyInput
                 label="Preço *"
                 name="preco"

@@ -5,6 +5,7 @@ import ServiceCatList from './pages/ServiceCategory/List';
 import Service from './pages/Service/List';
 import Customer from './pages/Customer/List';
 import Employee from './pages/Employee/List';
+import Entry from './pages/Entry/List';
 import Main from './pages/Main';
 
 export default function Routes() {
@@ -16,6 +17,7 @@ export default function Routes() {
         <Route path="/servicos" component={Service} />
         <Route path="/clientes" component={Customer} />
         <Route path="/empregados" component={Employee} />
+        <Route path="/entradas" component={Entry} />
       </Switch>
     </BrowserRouter>
   );

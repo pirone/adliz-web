@@ -9,13 +9,13 @@ export default function Menu(props) {
       <ul className="nav flex-column">
         <li className="nav-item">
           <a href="/" className="nav-link">
-            <i className="fa fa-th-large" />
+            <i className="fa fa-home" />
             Home
           </a>
         </li>
         <li className="nav-item">
           <a href="/categoriasServico" className="nav-link">
-            <i className="fa fa-address-card" />
+            <i className="fa fa-cut" />
             Categorias de Serviço
           </a>
         </li>
@@ -33,8 +33,20 @@ export default function Menu(props) {
         </li>
         <li className="nav-item">
           <a href="/empregados" className="nav-link">
-            <i className="fa fa-picture-o" />
+            <i className="fa fa-address-card" />
             Empregados
+          </a>
+        </li>
+        <li className="nav-item">
+          <a href="/entradas" className="nav-link">
+            <i className="fa fa-tag" />
+            Entradas
+          </a>
+        </li>
+        <li className="nav-item">
+          <a href="/lancamentos" className="nav-link">
+            <i className="fa fa-balance-scale" />
+            Lançamentos
           </a>
         </li>
       </ul>
