@@ -10,6 +10,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import { Form, InputGroup } from 'react-bootstrap';
 
+import { Row } from './styles';
+
 registerLocale('pt', pt);
 setDefaultLocale('pt');
 
@@ -183,23 +185,36 @@ export function PhoneInput({ label, name, onChange, value, errors }) {
   );
 }
 
-export function Combobox({ label, name, onChange, options, value }) {
+export function Combobox({
+  label,
+  name,
+  onChange,
+  options,
+  value,
+  className,
+  children,
+}) {
   return (
     <Form.Group>
       <Form.Label>{label}</Form.Label>
-      <Form.Control
-        as="select"
-        custom="true"
-        name={name}
-        onChange={onChange}
-        value={value}
-      >
-        {options.map(opt => (
-          <option key={opt.id} value={opt.id}>
-            {opt.name}
-          </option>
-        ))}
-      </Form.Control>
+      <Row>
+        <Form.Control
+          as="select"
+          custom="true"
+          name={name}
+          onChange={onChange}
+          value={value}
+          className={className}
+        >
+          <option value="">Selecione uma opção</option>
+          {options.map(opt => (
+            <option key={opt.id} value={opt.id}>
+              {opt.name}
+            </option>
+          ))}
+        </Form.Control>
+        {children}
+      </Row>
     </Form.Group>
   );
 }

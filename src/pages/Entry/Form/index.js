@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useCallback, useEffect } from 'react';
-import { Form, Button, Modal } from 'react-bootstrap';
-import { Formik } from 'formik';
+import { Form, Button, Modal, Table } from 'react-bootstrap';
+import { Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 
 import api from '../../../services/api';
@@ -12,11 +12,14 @@ import {
   PercentInput,
 } from '../../../components/Form';
 
+import { CustomCombo, BtRemoveItem } from './styles';
+
 export default function FormService(props) {
   const [entry, setEntry] = useState([]);
   const [customers, setCustomers] = useState([]);
-  const [services, setServices] = useState();
+  const [services, setServices] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [servicosRealizados, setServicosRealizados] = useState([]);
 
   const regexMoney = '^[1-9]\\d{0,2}(\\.\\d{3})*(,\\d{2})?$';
 
@@ -60,6 +63,35 @@ export default function FormService(props) {
       });
   }, []);
 
+  const loadComission = employeeId => {
+    return api
+      .get(`/employee/${employeeId}`)
+      .then(response => {
+        console.log(response.data.comissionRate);
+        return response.data.comissionRate;
+      })
+      .catch(error => console.log(error));
+  };
+
+  const addServ = async id => {
+    if (id !== '') {
+      console.log(servicosRealizados.length + 1);
+      try {
+        const newServ = await api.get(`/service/${id}`);
+        console.log(newServ.data);
+        setServicosRealizados([...servicosRealizados, newServ.data]);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const removeServ = index => {
+    const newList = [...servicosRealizados];
+    newList.splice(index, 1);
+    setServicosRealizados(newList);
+  };
+
   const getCustomers = useCallback(() => {
     api
       .get(`/customer/all/`)
@@ -78,8 +110,38 @@ export default function FormService(props) {
     if (typeof entryId !== 'undefined') {
       getEntry(entryId);
     }
-    // console.log(service ? 'service.name' : 'Vazio');
-  }, [getServices, getEmployees, getCustomers, entryId]);
+  }, [getServices, getEmployees, getCustomers, entryId, servicosRealizados]);
+
+  const defaultValues = {
+    comissao: employees.length ? employees[0].comissionRate : '',
+    servico: entry && entry.service ? entry.service.id : '',
+  };
+
+  // const ComboFuncionarios = () => {
+  //   const { values, handleChange, setFieldValue } = useFormikContext();
+  //   useEffect(() => {
+  //     async function attComissao() {
+  //       if (values.funcionario && values.funcionario !== '') {
+  //         const comissao = await loadComission(values.funcionario);
+  //         console.log(comissao);
+  //         setFieldValue('comissao', comissao);
+  //       }
+  //     }
+
+  //     attComissao();
+  //   }, [values.funcionario]);
+  //   return (
+  //     <Combobox
+  //       label="Funcionário"
+  //       name="funcionario"
+  //       onChange={async e => {
+  //         handleChange(e);
+  //       }}
+  //       value={values.funcionario}
+  //       options={employees}
+  //     />
+  //   );
+  // };
 
   return (
     <Formik
@@ -90,12 +152,22 @@ export default function FormService(props) {
           ? props.setSubmit(values, entry.id)
           : props.setSubmit(values, resetForm);
       }}
-      initialValues={{
-        comissao: employees.length ? employees[0].comissionRate : '',
-      }}
+      initialValues={defaultValues}
     >
-      {({ handleSubmit, handleChange, values, errors, touched }) => (
-        <Modal show={modalForm} onHide={handleClose} backdrop="static">
+      {({
+        handleSubmit,
+        handleChange,
+        values,
+        errors,
+        touched,
+        setFieldValue,
+      }) => (
+        <Modal
+          show={modalForm}
+          onHide={handleClose}
+          backdrop="static"
+          size="lg"
+        >
           <Modal.Header closeButton>
             <Modal.Title>Preencha o formulário</Modal.Title>
           </Modal.Header>
@@ -108,22 +180,75 @@ export default function FormService(props) {
                 value={values.cliente}
                 options={customers}
               />
+              {/* <ComboFuncionarios /> */}
               <Combobox
                 label="Funcionário"
                 name="funcionario"
-                onChange={e => {
+                onChange={async e => {
                   handleChange(e);
-                  values.comissao = '10,00';
+                  setFieldValue(
+                    'comissao',
+                    await loadComission(e.target.value)
+                  );
                 }}
                 value={values.funcionario}
                 options={employees}
               />
-              <Combobox
+              <hr />
+              <CustomCombo
+                className="cbwbuton"
                 label="Serviço"
                 name="servico"
                 onChange={handleChange}
                 value={values.servico}
                 options={services}
+              >
+                <Button
+                  variant="outline-primary"
+                  onClick={() => addServ(values.servico)}
+                >
+                  <i className="fa fa-plus-circle" />
+                </Button>
+              </CustomCombo>
+
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Serviço realizado</th>
+                    <th>Valor</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {servicosRealizados.map((serv, index) => (
+                    <tr
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`servicosRealizados-${index}`}
+                      id={`servicosRealizados-${index}`}
+                    >
+                      <td>{serv.name}</td>
+                      <td>
+                        {new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                        }).format(serv.price)}
+                      </td>
+                      <td>
+                        <BtRemoveItem
+                          variant="outline-danger"
+                          onClick={() => removeServ(index)}
+                        >
+                          <i className="fa fa-minus-circle" />
+                        </BtRemoveItem>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              <input
+                type="hidden"
+                name="services"
+                value={servicosRealizados.map(item => item.id)}
               />
               <PercentInput
                 label="Comissão"
@@ -135,7 +260,11 @@ export default function FormService(props) {
               <MoneyInput
                 label="Preço *"
                 name="preco"
-                value={values.preco}
+                value={servicosRealizados
+                  .map(item => item.price)
+                  .reduce((a, b) => a + b, 0)
+                  .toString()
+                  .replace('.', ',')}
                 onChange={handleChange}
                 errors={[errors.preco, touched.preco]}
               />

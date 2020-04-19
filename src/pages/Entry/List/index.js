@@ -8,22 +8,22 @@ import { InfoModal, ConfirmDialog } from '../../../components/Modal';
 import Pagination from '../../../components/Pagination';
 
 export default function EntryList() {
-  const [services, setServices] = useState([]);
+  const [entries, setEntries] = useState([]);
   const [showAddFormModal, setShowAddFormModal] = useState(false);
   const [showEditFormModal, setShowEditFormModal] = useState(false);
   const [showDeleteFormModal, setShowDeleteFormModal] = useState(false);
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [modalResponseContent, setModalResponseContent] = useState();
-  const [serviceUpdate, setServiceUpdate] = useState();
-  const [serviceDelete, setServiceDelete] = useState();
+  const [entryUpdate, setEntryUpdate] = useState();
+  const [entryDelete, setEntryDelete] = useState();
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState();
 
-  const getServices = useCallback(() => {
+  const getEntries = useCallback(() => {
     api
-      .get(`/service/all/${currentPage}`)
+      .get(`/entry/all/${currentPage}`)
       .then(result => {
-        setServices(result.data.content);
+        setEntries(result.data.content);
         setTotalPages(result.data.totalPages);
       })
       .catch(error => {
@@ -32,8 +32,8 @@ export default function EntryList() {
   }, [currentPage]);
 
   useEffect(() => {
-    getServices();
-  }, [getServices, currentPage]);
+    getEntries();
+  }, [getEntries, currentPage]);
 
   const showHideAddModal = () => {
     setShowAddFormModal(!showAddFormModal);
@@ -42,13 +42,13 @@ export default function EntryList() {
   const showHideEditModal = id => {
     setShowEditFormModal(!showEditFormModal);
     if (showEditFormModal === false) {
-      setServiceUpdate(id);
+      setEntryUpdate(id);
     }
   };
 
   const showHideDeleteModal = id => {
     setShowDeleteFormModal(!showDeleteFormModal);
-    setServiceDelete(id);
+    setEntryDelete(id);
   };
 
   const showHideResponseModal = () => {
@@ -56,7 +56,7 @@ export default function EntryList() {
   };
 
   const setSubmit = (values, resetForm) => {
-    const service = {
+    const entry = {
       name: values.nome,
       description: values.descricao,
       price: values.preco,
@@ -66,10 +66,10 @@ export default function EntryList() {
     };
 
     api
-      .post(`/service`, service)
+      .post(`/entry`, entry)
       .then(res => {
         setModalResponseContent(res.data.message);
-        getServices();
+        getEntries();
         showHideAddModal();
         resetForm();
       })
@@ -88,7 +88,7 @@ export default function EntryList() {
   };
 
   const setUpdate = (values, id) => {
-    const service = {
+    const entry = {
       name: values.nome,
       description: values.descricao,
       price: values.preco,
@@ -98,10 +98,10 @@ export default function EntryList() {
     };
 
     api
-      .put(`/service/${id}`, service)
+      .put(`/entry/${id}`, entry)
       .then(res => {
         setModalResponseContent(res.data);
-        getServices();
+        getEntries();
         showHideEditModal();
       })
       .catch(error => {
@@ -120,10 +120,10 @@ export default function EntryList() {
 
   const handleDelete = () => {
     api
-      .delete(`/serviceService/${serviceDelete}`)
+      .delete(`/entryEntry/${entryDelete}`)
       .then(res => {
         setModalResponseContent(res.data);
-        getServices();
+        getEntries();
         showHideDeleteModal();
       })
       .catch(error => {
@@ -144,7 +144,7 @@ export default function EntryList() {
     <div className="container">
       <div className="topbox">
         <div className="pageTitle">
-          <h1>Serviços</h1>
+          <h1>Entradas</h1>
         </div>
         <div className="pageButton">
           <Button variant="dark" type="button" onClick={showHideAddModal}>
@@ -155,36 +155,34 @@ export default function EntryList() {
       <Table responsive>
         <thead>
           <tr>
-            <th>Nome</th>
-            <th>Descrição</th>
-            <th>Categoria</th>
-            <th>Preço</th>
+            <th>Funcionário</th>
+            <th>Cliente</th>
+            <th>Total</th>
             <th className="actions">Ações</th>
           </tr>
         </thead>
         <tbody>
-          {services.map(service => (
-            <tr key={service.id}>
-              <td>{service.name}</td>
-              <td>{service.description}</td>
-              <td>{service.category.name}</td>
+          {entries.map(entry => (
+            <tr key={entry.id}>
+              <td>{entry.employee.person.name}</td>
+              <td>{entry.customer.person.name}</td>
               <td>
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
-                }).format(service.price)}
+                }).format(entry.record.value)}
               </td>
               <td>
                 <Button
                   variant="dark"
                   className="btEdit"
-                  onClick={() => showHideEditModal(service.id)}
+                  onClick={() => showHideEditModal(entry.id)}
                 >
                   <i className="fa fa-edit" />
                 </Button>
                 <Button
                   variant="dark"
-                  onClick={() => showHideDeleteModal(service.id)}
+                  onClick={() => showHideDeleteModal(entry.id)}
                 >
                   <i className="fa fa-trash" />
                 </Button>
@@ -204,7 +202,7 @@ export default function EntryList() {
         setSubmit={setSubmit}
       />
       <Form
-        serviceId={serviceUpdate}
+        entryId={entryUpdate}
         modalForm={showEditFormModal}
         handleClose={showHideEditModal}
         setSubmit={setUpdate}
