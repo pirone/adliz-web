@@ -55,45 +55,56 @@ export default function EntryList() {
     setShowResponseModal(!showResponseModal);
   };
 
-  const setSubmit = (values, resetForm) => {
+  const setSubmit = async (values, resetForm, customReset) => {
     const entry = {
-      name: values.nome,
-      description: values.descricao,
-      price: values.preco,
-      category: {
-        id: values.categoria,
+      employee: values.funcionario,
+      customer: values.cliente,
+      services: values.services,
+      comission: values.comissao,
+      paymentMethod: {
+        id: values.formaPagamento,
+      },
+      record: {
+        value: values.total,
+        type: 'C',
+        description: values.descricao,
       },
     };
 
-    api
-      .post(`/entry`, entry)
-      .then(res => {
-        setModalResponseContent(res.data.message);
-        getEntries();
-        showHideAddModal();
-        resetForm();
-      })
-      .catch(error => {
-        if (!error.response) {
-          // network error
-          setModalResponseContent(
-            'Ocorreu um erro de conexão com o servidor. Por favor contacte um administrador.'
-          );
-        } else {
-          setModalResponseContent(error.response.data.message);
-        }
-      });
-
+    try {
+      const response = await api.post(`/entry`, entry);
+      setModalResponseContent(response.data.message);
+      getEntries();
+      showHideAddModal();
+      resetForm();
+      customReset();
+    } catch (error) {
+      console.log(error);
+      if (!error.response) {
+        // network error
+        setModalResponseContent(
+          'Ocorreu um erro de conexão com o servidor. Por favor contacte um administrador.'
+        );
+      } else {
+        setModalResponseContent(error.response.data.message);
+      }
+    }
     setShowResponseModal(true);
   };
 
   const setUpdate = (values, id) => {
     const entry = {
-      name: values.nome,
-      description: values.descricao,
-      price: values.preco,
-      category: {
-        id: values.categoria,
+      employee: values.funcionario,
+      customer: values.cliente,
+      services: values.services,
+      comission: values.comissao,
+      paymentMethod: {
+        id: values.formaPagamento,
+      },
+      record: {
+        value: values.total,
+        type: 'C',
+        description: values.descricao,
       },
     };
 
@@ -158,20 +169,22 @@ export default function EntryList() {
             <th>Funcionário</th>
             <th>Cliente</th>
             <th>Total</th>
+            <th>Data</th>
             <th className="actions">Ações</th>
           </tr>
         </thead>
         <tbody>
           {entries.map(entry => (
             <tr key={entry.id}>
-              <td>{entry.employee.person.name}</td>
-              <td>{entry.customer.person.name}</td>
+              <td>{entry.funcionario}</td>
+              <td>{entry.cliente}</td>
               <td>
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
-                }).format(entry.record.value)}
+                }).format(entry.total)}
               </td>
+              <td>{entry.dataRegistro}</td>
               <td>
                 <Button
                   variant="dark"

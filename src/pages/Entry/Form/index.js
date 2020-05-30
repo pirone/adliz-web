@@ -1,5 +1,10 @@
 /* eslint-disable react/prop-types */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+} from 'react';
 import { Form, Button, Modal, Table } from 'react-bootstrap';
 import { Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
@@ -19,18 +24,27 @@ export default function FormService(props) {
   const [customers, setCustomers] = useState([]);
   const [services, setServices] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [valorTotal, setValorTotal] = useState(0);
   const [servicosRealizados, setServicosRealizados] = useState([]);
 
-  const regexMoney = '^[1-9]\\d{0,2}(\\.\\d{3})*(,\\d{2})?$';
-
   const formSchema = Yup.object().shape({
-    nome: Yup.string().required('Campo Obrigatório.'),
-    preco: Yup.string()
-      .required('Campo Obrigatório.')
-      .matches(regexMoney, 'Valor inválido.'),
+    total: Yup.string().required('Campo Obrigatório.'),
+    services: Yup.string().required('Pelo menos um serviço deve ser informado'),
+    comissao: Yup.string().required('Campo Obrigatório'),
+    cliente: Yup.string().required('Campo Obrigatório'),
+    funcionario: Yup.string().required('Campo Obrigatório'),
   });
 
   const { entryId, handleClose, modalForm } = props;
+
+  const toBRL = number => {
+    const formatter = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    });
+    return formatter.format(number);
+  };
 
   const getEntry = async id => {
     try {
@@ -67,29 +81,9 @@ export default function FormService(props) {
     return api
       .get(`/employee/${employeeId}`)
       .then(response => {
-        console.log(response.data.comissionRate);
         return response.data.comissionRate;
       })
       .catch(error => console.log(error));
-  };
-
-  const addServ = async id => {
-    if (id !== '') {
-      console.log(servicosRealizados.length + 1);
-      try {
-        const newServ = await api.get(`/service/${id}`);
-        console.log(newServ.data);
-        setServicosRealizados([...servicosRealizados, newServ.data]);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-
-  const removeServ = index => {
-    const newList = [...servicosRealizados];
-    newList.splice(index, 1);
-    setServicosRealizados(newList);
   };
 
   const getCustomers = useCallback(() => {
@@ -103,18 +97,38 @@ export default function FormService(props) {
       });
   }, []);
 
+  const getFormasPagamento = useCallback(() => {
+    api
+      .get(`/paymentMethod/all/`)
+      .then(result => {
+        setPaymentMethods(result.data.content);
+      })
+      .catch(error => {
+        console.log(error.message);
+      });
+  }, []);
+
   useEffect(() => {
     getServices();
     getEmployees();
     getCustomers();
+    getFormasPagamento();
     if (typeof entryId !== 'undefined') {
       getEntry(entryId);
     }
-  }, [getServices, getEmployees, getCustomers, entryId, servicosRealizados]);
+  }, [entryId]);
+
+  const customReset = () => {
+    setServicosRealizados([]);
+  };
 
   const defaultValues = {
     comissao: employees.length ? employees[0].comissionRate : '',
     servico: entry && entry.service ? entry.service.id : '',
+    total: servicosRealizados.length ? valorTotal : '0',
+    services: servicosRealizados.length
+      ? servicosRealizados.map(item => item.id)
+      : '',
   };
 
   // const ComboFuncionarios = () => {
@@ -143,14 +157,151 @@ export default function FormService(props) {
   //   );
   // };
 
+  const InputTotal = () => {
+    const { values, errors, touched } = useFormikContext();
+    return (
+      <MoneyInput
+        readOnly="true"
+        label="Preço *"
+        name="total"
+        value={new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }).format(values.total)}
+        errors={[errors.total, touched.total]}
+      />
+    );
+  };
+
+  const ComboServicos = () => {
+    const { values, handleChange, setFieldValue } = useFormikContext();
+
+    const servArrayId = servicosRealizados.map(serv => serv.id);
+
+    const funcionarioSelecionado = values.funcionario;
+
+    const addServ = async id => {
+      console.log(funcionarioSelecionado);
+      if (id !== '' && !servArrayId.includes(id)) {
+        try {
+          const newServ = await api.get(`/service/${id}`);
+          await setServicosRealizados([...servicosRealizados, newServ.data]);
+          setFieldValue('total', Number(values.total) + newServ.data.price);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+
+    return (
+      <CustomCombo
+        className="cbwbuton"
+        label="Serviço"
+        name="servico"
+        onChange={handleChange}
+        value={values.servico}
+        options={services}
+      >
+        <Button
+          variant="outline-primary"
+          onClick={e => {
+            e.preventDefault();
+            addServ(values.servico);
+            setFieldValue('services', [...values.services, values.servico]);
+            setFieldValue(
+              'total',
+              servicosRealizados
+                .map(item => item.price)
+                .reduce((a, b) => a + b, 0)
+                .toString()
+                .replace('.', ',')
+            );
+          }}
+        >
+          <i className="fa fa-plus-circle" />
+        </Button>
+      </CustomCombo>
+    );
+  };
+
+  const TableServicosRealizados = () => {
+    const { values, setFieldValue, setValues } = useFormikContext();
+
+    useEffect(() => {
+      if (entry.id) {
+        setFieldValue('cliente', entry.customer.id);
+        setFieldValue('funcionario', entry.employee.id);
+        setFieldValue('comissao', entry.comission);
+        setFieldValue('total', entry.record.value);
+        setFieldValue('formaPagamento', entry.paymentMethod.id);
+        setServicosRealizados(entry.services);
+        setFieldValue(
+          'services',
+          entry.services.map(service => service.id)
+        );
+        // entry.services.map(item =>
+        //   setServicosRealizados([...servicosRealizados, item])
+        // );
+      }
+    }, []);
+
+    const removeServ = index => {
+      setFieldValue(
+        'total',
+        Number(values.total) - servicosRealizados[index].price
+      );
+      const newList = [...servicosRealizados];
+      newList.splice(index, 1);
+      setServicosRealizados(newList);
+    };
+
+    return (
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Serviço realizado</th>
+            <th>Valor</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {servicosRealizados.map((serv, index) => (
+            <tr
+              // eslint-disable-next-line react/no-array-index-key
+              key={`servicosRealizados-${index}`}
+              id={`servicosRealizados-${index}`}
+            >
+              <td>{serv.name}</td>
+              <td>
+                {new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                }).format(serv.price)}
+              </td>
+              <td>
+                <BtRemoveItem
+                  variant="outline-danger"
+                  onClick={() => {
+                    removeServ(index);
+                  }}
+                >
+                  <i className="fa fa-minus-circle" />
+                </BtRemoveItem>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    );
+  };
+
   return (
     <Formik
-      enableReinitialize
       validationSchema={formSchema}
       onSubmit={(values, { resetForm }) => {
-        entry
-          ? props.setSubmit(values, entry.id)
-          : props.setSubmit(values, resetForm);
+        entry.id
+          ? props.setSubmit(values, entry.id, resetForm)
+          : props.setSubmit(values, resetForm, customReset);
       }}
       initialValues={defaultValues}
     >
@@ -178,12 +329,14 @@ export default function FormService(props) {
                 name="cliente"
                 onChange={handleChange}
                 value={values.cliente}
+                errors={errors.cliente}
                 options={customers}
               />
               {/* <ComboFuncionarios /> */}
               <Combobox
                 label="Funcionário"
                 name="funcionario"
+                errors={errors.funcionario}
                 onChange={async e => {
                   handleChange(e);
                   setFieldValue(
@@ -195,61 +348,16 @@ export default function FormService(props) {
                 options={employees}
               />
               <hr />
-              <CustomCombo
-                className="cbwbuton"
-                label="Serviço"
-                name="servico"
-                onChange={handleChange}
-                value={values.servico}
-                options={services}
-              >
-                <Button
-                  variant="outline-primary"
-                  onClick={() => addServ(values.servico)}
-                >
-                  <i className="fa fa-plus-circle" />
-                </Button>
-              </CustomCombo>
+              <ComboServicos />
 
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Serviço realizado</th>
-                    <th>Valor</th>
-                    <th>Ação</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {servicosRealizados.map((serv, index) => (
-                    <tr
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={`servicosRealizados-${index}`}
-                      id={`servicosRealizados-${index}`}
-                    >
-                      <td>{serv.name}</td>
-                      <td>
-                        {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                        }).format(serv.price)}
-                      </td>
-                      <td>
-                        <BtRemoveItem
-                          variant="outline-danger"
-                          onClick={() => removeServ(index)}
-                        >
-                          <i className="fa fa-minus-circle" />
-                        </BtRemoveItem>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-              <input
-                type="hidden"
-                name="services"
-                value={servicosRealizados.map(item => item.id)}
-              />
+              <TableServicosRealizados />
+
+              <Form.Group>
+                <input name="services" value={values.services} />
+                <Form.Control.Feedback type="invalid" className="visible">
+                  {errors.services}
+                </Form.Control.Feedback>
+              </Form.Group>
               <PercentInput
                 label="Comissão"
                 name="comissao"
@@ -257,16 +365,14 @@ export default function FormService(props) {
                 onChange={handleChange}
                 errors={[errors.comissao, touched.comissao]}
               />
-              <MoneyInput
-                label="Preço *"
-                name="preco"
-                value={servicosRealizados
-                  .map(item => item.price)
-                  .reduce((a, b) => a + b, 0)
-                  .toString()
-                  .replace('.', ',')}
+              <InputTotal />
+              <Combobox
+                label="Forma de Pagamento"
+                name="formaPagamento"
                 onChange={handleChange}
-                errors={[errors.preco, touched.preco]}
+                value={values.formaPagamento}
+                errors={errors.formaPagamento}
+                options={paymentMethods}
               />
             </Modal.Body>
             <Modal.Footer>

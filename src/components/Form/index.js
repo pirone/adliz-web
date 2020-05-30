@@ -193,6 +193,7 @@ export function Combobox({
   value,
   className,
   children,
+  errors,
 }) {
   return (
     <Form.Group>
@@ -204,7 +205,7 @@ export function Combobox({
           name={name}
           onChange={onChange}
           value={value}
-          className={className}
+          className={`${className}${handleValid(errors)}`}
         >
           <option value="">Selecione uma opção</option>
           {options.map(opt => (
@@ -215,6 +216,7 @@ export function Combobox({
         </Form.Control>
         {children}
       </Row>
+      <Form.Control.Feedback type="invalid">{errors}</Form.Control.Feedback>
     </Form.Group>
   );
 }

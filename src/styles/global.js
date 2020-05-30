@@ -91,4 +91,8 @@ export default createGlobalStyle`
       }
   }
 
+  .invalid-feedback {
+    display: block;
+  }
+
 `;
